@@ -39,10 +39,13 @@ function openfuego_get_metadata($input_urls, $params = NULL, $format = 'json') {
 			$url = urldecode($input_url);
 			$url = urlencode($url);
 			$urls .= $url . ',';
-		}
+		}	
+		$urls = substr_replace($urls, '', -1);
+
+	} else {
+		
+		$urls = $input_urls;
 	}
-	
-	$urls = substr_replace($urls, '', -1);
 		
 	if ($params) {
 		$params = implode('&', $params);
