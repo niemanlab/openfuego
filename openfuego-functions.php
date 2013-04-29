@@ -359,7 +359,7 @@ function openfuego_get_items($quantity = 10, $hours = 24, $scoring = TRUE, $meta
 	
 	$openfuego_items_filtered = array_slice($openfuego_items_filtered, 0, $quantity);
 
-	if ($metadata) {
+	if ($metadata && defined('OPENFUEGO_EMBEDLY_API_KEY') && OPENFUEGO_EMBEDLY_API_KEY) {
 		foreach ($openfuego_items_filtered as $openfuego_item_filtered) {
 			$urls[] = $openfuego_item_filtered['url'];
 		}
