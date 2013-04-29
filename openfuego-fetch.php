@@ -85,9 +85,11 @@ if (!$pids[0]) {
 	// Comment out the next line if you do not want to repopulate the universe on each fetch
 	// openfuego_populate_universe($openfuego_authorities, 1);
 	
-	$universe = openfuego_get_universe(1);
-	if (!$universe)
-		die('Unable to get OpenFuego universe.');
+	if (!$universe = openfuego_get_universe(1)) {
+		openfuego_populate_universe($openfuego_authorities, 1);
+		$universe = openfuego_get_universe(1);
+	}
+
 	$universe = array_slice($universe, 0, OPENFUEGO_TW_PREDICATE_LIMIT);
 		
 	// Start streaming/collecting
