@@ -394,7 +394,7 @@ function openfuego_get_items($quantity = 10, $hours = 24, $scoring = TRUE, $meta
 
 		$openfuego_items_filtered[$i]['rank'] = $i+1;
 
-		if ($metadata) {
+		if ($metadata && defined('OPENFUEGO_EMBEDLY_API_KEY') && OPENFUEGO_EMBEDLY_API_KEY) {
 			
 			$status = openfuego_get_tweet($link_id);
 	
@@ -459,12 +459,8 @@ function openfuego_get_tweet($link_id) {
 		}
 		
 		if (empty($id_str) || $id_str == NULL) {
-			$status = openfuego_update_tweet($link_id);
 
-			$id_str = $status['id_str'];
-			$from_user = $status['from_user'];
-			$text = $status['text'];
-			$profile_image_url = $status['profile_image_url'];
+			return FALSE;
 
 		} else {
 
@@ -479,11 +475,14 @@ function openfuego_get_tweet($link_id) {
 			}
 
 			elseif ($twitter->http_code == 403 || $twitter->http_code == 404) {
+/*
 				$status = openfuego_update_tweet($link_id);
 				$id_str = $status['id_str'];
 				$from_user = $status['from_user'];
 				$text = $status['text'];
 				$profile_image_url = $status['profile_image_url'];
+*/
+				return FALSE;
 			}
 			
 			elseif ($twitter->http_code == 503) {
