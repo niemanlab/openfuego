@@ -34,7 +34,7 @@ define('OPENFUEGO_POSTMASTER', 'openfuego@openfuego.local'); // the "from" addre
 define('OPENFUEGO_TW_PREDICATE_LIMIT', 5000);
 
 define('OPENFUEGO_EMBEDLY_API_ROOT', 'http://api.embed.ly/1');
-define('OPENFUEGO_EMBEDLY_API_ENDPOINT', 'preview');
+define('OPENFUEGO_EMBEDLY_API_ENDPOINT', 'oembed');
 
 /*
 global $argv;

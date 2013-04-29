@@ -69,7 +69,7 @@ define('OPENFUEGO_BITLY_API_KEY',	'');
 **/
 define('OPENFUEGO_GOOGL_API_KEY',	''); // Optional, recommended. Leave blank to disable.
 
-/** Your Embed.ly API credentials. Visit this page for a free account: https://app.embed.ly/pricing/free 
+/** Your Embed.ly API credentials. Visit this page for a free account: http://embed.ly/embed/pricing 
   * Optional, but required for OpenFuego to return metadata with URLs.
 **/
 define('OPENFUEGO_EMBEDLY_API_KEY',	''); // Optional, recommended. Leave blank to disable.
