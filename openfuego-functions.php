@@ -307,7 +307,8 @@ function openfuego_get_items($quantity = 10, $hours = 24, $scoring = TRUE, $meta
 			
 	if (!$openfuego_items) {
 		openfuego_notify('OpenFuego exception in ' . __FUNCTION__, "The following query returned 0 results: $sql");
-		return FALSE; }
+		return FALSE;
+	}
 
 	foreach ($openfuego_items as $openfuego_item) {
 	
@@ -399,20 +400,20 @@ function openfuego_get_items($quantity = 10, $hours = 24, $scoring = TRUE, $meta
 			$status = openfuego_get_tweet($link_id);
 	
 			$tw_id_str = $status['id_str'];
-			$tw_from_user = $status['from_user'];
+			$tw_screen_name = $status['screen_name'];
 			$tw_text = $status['text'];
 			$tw_profile_image_url = $status['profile_image_url'];
 			$tw_profile_image_url_bigger = str_replace('_normal.', '_bigger.', $tw_profile_image_url);
-			$tw_tweet_url = 'https://twitter.com/' . $tw_from_user . '/status/' . $tw_id_str;
+			$tw_tweet_url = 'https://twitter.com/' . $tw_screen_name . '/status/' . $tw_id_str;
 	
 			$openfuego_items_filtered[$i]['tw_id_str'] = $tw_id_str;
-	 		$openfuego_items_filtered[$i]['tw_from_user'] = $tw_from_user;
+	 		$openfuego_items_filtered[$i]['tw_screen_name'] = $tw_screen_name;
 			$openfuego_items_filtered[$i]['tw_text'] = $tw_text;
 			$openfuego_items_filtered[$i]['tw_profile_image_url'] = $tw_profile_image_url;
 			$openfuego_items_filtered[$i]['tw_profile_image_url_bigger'] = $tw_profile_image_url_bigger;
 			$openfuego_items_filtered[$i]['tw_tweet_url'] = $tw_tweet_url;
 			
-			$openfuego_items_filtered[$i] = array_merge($openfuego_items_filtered[$i], $link_meta[$i]);
+			$openfuego_items_filtered[$i]['metadata'] = $link_meta[$i];
 			unset($openfuego_items_filtered[$i]['html']);
 		}
 	}
@@ -426,7 +427,7 @@ function openfuego_get_tweet($link_id) {
 	$dbh = openfuego_get_dbh();
 
 	try {
-		$sth = $dbh->prepare("SELECT id_str, from_user, text, profile_image_url FROM openfuego_tweets_cache WHERE link_id = :link_id LIMIT 1;");
+		$sth = $dbh->prepare("SELECT id_str, screen_name, text, profile_image_url FROM openfuego_tweets_cache WHERE link_id = :link_id LIMIT 1;");
 		$sth->bindParam('link_id', $link_id);
 		$sth->execute();
 
@@ -440,7 +441,7 @@ function openfuego_get_tweet($link_id) {
 	if ($tweets_cache_row) {  // if tweet CACHED
 
 		$id_str = $tweets_cache_row[0];
-		$from_user = $tweets_cache_row[1];
+		$screen_name = $tweets_cache_row[1];
 		$text = $tweets_cache_row[2];
 		$profile_image_url = $tweets_cache_row[3];
 
@@ -461,7 +462,7 @@ function openfuego_get_tweet($link_id) {
 		if (empty($id_str) || $id_str == NULL) {
 			$status = openfuego_update_tweet($link_id);
 			$id_str = $status['id_str'];
-			$from_user = $status['from_user'];
+			$screen_name = $status['screen_name'];
 			$text = $status['text'];
 			$profile_image_url = $status['profile_image_url'];
 
@@ -472,7 +473,7 @@ function openfuego_get_tweet($link_id) {
 
 			if ($twitter->http_code == 200) {
 				$id_str = $status['id_str'];
-				$from_user = $status['user']['screen_name'];
+				$screen_name = $status['user']['screen_name'];
 				$text = $status['text'];
 				$profile_image_url = $status['user']['profile_image_url'];
 			}
@@ -480,7 +481,7 @@ function openfuego_get_tweet($link_id) {
 			elseif ($twitter->http_code == 403 || $twitter->http_code == 404) {
 				$status = openfuego_update_tweet($link_id);
 				$id_str = $status['id_str'];
-				$from_user = $status['from_user'];
+				$screen_name = $status['screen_name'];
 				$text = $status['text'];
 				$profile_image_url = $status['profile_image_url'];
 			}
@@ -506,14 +507,14 @@ function openfuego_get_tweet($link_id) {
 			}
 		}
 
-		// $tweet_to_cache = array($link_id, $id_str, $from_user, $text, $profile_image_url);
+		// $tweet_to_cache = array($link_id, $id_str, $screen_name, $text, $profile_image_url);
 	
 		try {
-			$sth = $dbh->prepare("INSERT IGNORE INTO openfuego_tweets_cache (link_id, id_str, from_user, text, profile_image_url) VALUES (:link_id, :id_str, :from_user, :text, :profile_image_url);");
-/* 		$sth = $dbh->prepare("INSERT INTO openfuego_tweets_cache (link_id, id_str, from_user, text, profile_image_url) VALUES (:link_id, :id_str, :from_user, :text, :profile_image_url); UNLOCK TABLES"); */
+			$sth = $dbh->prepare("INSERT IGNORE INTO openfuego_tweets_cache (link_id, id_str, screen_name, text, profile_image_url) VALUES (:link_id, :id_str, :screen_name, :text, :profile_image_url);");
+/* 		$sth = $dbh->prepare("INSERT INTO openfuego_tweets_cache (link_id, id_str, screen_name, text, profile_image_url) VALUES (:link_id, :id_str, :screen_name, :text, :profile_image_url); UNLOCK TABLES"); */
 			$sth->bindParam('link_id', $link_id);
 			$sth->bindParam('id_str', $id_str);
-			$sth->bindParam('from_user', $from_user);
+			$sth->bindParam('screen_name', $screen_name);
 			$sth->bindParam('text', $text);
 			$sth->bindParam('profile_image_url', $profile_image_url);
 			$sth->execute();
@@ -524,206 +525,66 @@ function openfuego_get_tweet($link_id) {
 		}
 	}
 
-	$tweet = array('id_str' => $id_str, 'from_user' => $from_user, 'text' => $text, 'profile_image_url' => $profile_image_url);
-	$tweet['tweet_url'] = 'http://twitter.com/' . $from_user . '/statuses/' . $id_str . '/';
+	$tweet = array('id_str' => $id_str, 'screen_name' => $screen_name, 'text' => $text, 'profile_image_url' => $profile_image_url);
+	$tweet['tweet_url'] = 'http://twitter.com/' . $screen_name . '/statuses/' . $id_str . '/';
 	$tweet['profile_image_url_bigger'] = str_replace('_normal.', '_bigger.', $profile_image_url);
 		
 	return $tweet;
 }
 
 
-function openfuego_update_tweet($link_id, $first = FALSE) {
-
+function openfuego_update_tweet($link_id) {
+	
 	$dbh = openfuego_get_dbh();
 
-	if ($first):
-
-		$sth = $dbh->prepare("SELECT first_tweet FROM openfuego_links WHERE link_id = $link_id LIMIT 1;");
-		$sth->execute();
-		$id_str = $sth->fetchColumn();
-
-		if (!$id_str) {
-		//	echo 'No first tweet available.';
-			return FALSE;
-		}
-
-		$twitter = openfuego_twitter_connect();
-		$status = $twitter->get("statuses/show/$id_str", array('include_entities' => FALSE));
-		if ($twitter->http_code > 200) {
-			openfuego_notify('Twitter error ' . $twitter->http_code, __FUNCTION__ . "\n\n" . $twitter->url . "\n\n" . njl_curl($twitter->url));
-			return FALSE;
-		}
-
-		$from_user = $status['user']['screen_name'];
-		$text = $status['text'];
-		$profile_image_url = $status['user']['profile_image_url'];
-
-	else:
-
-		$query = $dbh->query("SELECT l.url, cache.input_url, cache.long_url FROM openfuego_short_links AS cache INNER JOIN openfuego_links AS l ON l.link_id = $link_id WHERE (cache.long_url LIKE l.url);");
-		
-		$rows = $query->fetchAll();
+	$query = $dbh->query("SELECT url, first_user_id FROM openfuego_links WHERE link_id = $link_id;");
 	
-		$search_base = 'https://search.twitter.com/search.json?rpp=100&lang=en&';
+	$rows = $query->fetchAll();
+
+	$twitter = openfuego_twitter_connect();
 		
-		foreach ($rows as $row) {
-	
-			$url = $row[0];
-			$url_encoded = urlencode($url);
-					
-			$short_url = $row[1];
-			$short_url_encoded = urlencode($short_url);
-	
-			$long_url = $row[2];
-			$long_url_encoded = urlencode($long_url);
-	/*
-			$canonical_url = $query_row[3];
-			$canonical_url_encoded = urlencode($canonical_url);
-	*/
-//			echo 'Trying first search...<br/>';
-			$search = openfuego_curl($search_base . "q=$short_url_encoded&result_type=popular", 'GET');
-			$search = json_decode($search, TRUE);
-			
-			if ($search['results']) {
-				$search_results = $search['results'];
-//				echo 'Got ' . count($search_results) . ' results (short url, popular)<br/>';
-				shuffle($search_results);	
+	foreach ($rows as $row) {
 
-				foreach ($search_results as $search_result) {
-					if ($new_search_result = openfuego_tweet_quality_filter($search_result)) {					
-						break 2;
-					} else {
-//						echo 'Failed quality check, trying next one...';
-						continue;
-					}
-				}
-			} else {
-			
-//				echo 'Trying short url mixed search<br/>';
-				$search = openfuego_curl($search_base . "q=$short_url_encoded&result_type=mixed", 'GET');
-				$search = json_decode($search, TRUE);
+		$url = $row[0];	
+		$first_user_id = $row[1];
 
-				if ($search['results']) {
-					$search_results = $search['results'];
-//					echo 'Got ' . count($search_results) . ' results (short url, mixed)<br/>';
-					shuffle($search_results);
-
-					foreach ($search_results as $search_result) {
-						if ($new_search_result = openfuego_tweet_quality_filter($search_result)) {					
-							break 2;
-						} else {
-//							echo 'Failed quality check, trying next one...';
-							continue;
-						}
-					}
-				} else {
-			
-					$search = openfuego_curl($search_base . "q=$url_encoded&result_type=popular", 'GET');
-					$search = json_decode($search, TRUE);
+		$search = $twitter->get("search/tweets", array('q' => $url, 'count' => 100));
+		// print_r($search); die;
+		// $search = json_decode($search, TRUE);
 		
-					if ($search['results']) {
-						$search_results = $search['results'];
-//						echo 'Got ' . count($search_results) . ' results (url, popular)<br/>';
-						shuffle($search_results);	
-						foreach ($search_results as $search_result) {
-							if ($new_search_result = openfuego_tweet_quality_filter($search_result)) {					
-								break 2;
-							} else {
-//								echo 'Failed quality check, trying next one...';
-								continue;
-							}
-						}
-					} else {
-			
-						$search = openfuego_curl($search_base . "q=$url_encoded&result_type=mixed", 'GET');
-						$search = json_decode($search, TRUE);
+		if ($search['statuses']) {
+			$search_results = $search['statuses'];
 
-//					echo "<pre>URL mix:\n";
-//					echo "</pre>";
-		
-						if ($search['results']) {
-//							echo 'not empty!<br/>';
-							$search_results = $search['results'];
-//							echo 'Got ' . count($search_results) . ' results (url, mixed)<br/>';
-							shuffle($search_results);
-							foreach ($search_results as $search_result) {
-								if ($new_search_result = openfuego_tweet_quality_filter($search_result)) {					
-									break 2;
-								} else {
-//									echo 'Failed quality check, trying next one...';
-									continue;
-								}
-							}
-						} else {
-					
-							$search = openfuego_curl($search_base . "q=$long_url_encoded&result_type=popular", 'GET');
-							$search = json_decode($search, TRUE);
-				
-							if ($search['results']) {
-								$search_results = $search['results'];
-//								echo 'Got ' . count($search_results) . ' results<br/>';
-								shuffle($search_results);	
-								foreach ($search_results as $search_result) {
-									if ($new_search_result = openfuego_tweet_quality_filter($search_result)) {					
-										break 2;
-									} else {
-									//	echo 'Failed quality check, trying next one...';
-										continue;
-									}
-								}
-							} else {
-					
-								$search = openfuego_curl($search_base . "q=$long_url_encoded&result_type=mixed", 'GET');
-								$search = json_decode($search, TRUE);
-				
-								if ($search['results']) {
-									$search_results = $search['results'];
-								//	echo 'Got ' . count($search_results) . '<br/>';
-									shuffle($search_results);	
-									foreach ($search_results as $search_result) {
-										if ($new_search_result = openfuego_tweet_quality_filter($search_result)) {					
-											break 2;
-										} else {
-											continue;
-										}
-									}
-								} else {
-									echo "<!-- No results for $short_url or $url or $long_url, giving up. -->\n";
-									return FALSE;
-								}
-							}
-						}
-					}
+			foreach ($search_results as $search_result) {
+				if ($search_result['user']['id_str'] == $first_user_id) {
+					break 2;
 				}
 			}
 		}
+	}
 
-		$id_str = $new_search_result['id_str'];
-		$from_user = $new_search_result['from_user'];
-		$text = $new_search_result['text'];
-		$profile_image_url = $new_search_result['profile_image_url'];
-
-	endif;
-
-	// $tweet_to_cache = array($link_id, $id_str, $from_user, $text, $profile_image_url);
+	$id_str = $search_result['user']['id_str'];
+	$screen_name = $search_result['user']['screen_name'];
+	$profile_image_url = $search_result['user']['profile_image_url'];
+	$text = $search_result['text'];
 
 	try {
-		$statement = $dbh->prepare("INSERT INTO openfuego_tweets_cache (link_id, id_str, from_user, text, profile_image_url) VALUES (:link_id, :id_str, :from_user, :text, :profile_image_url) ON DUPLICATE KEY UPDATE id_str=VALUES(id_str), from_user=VALUES(from_user), text=VALUES(text), profile_image_url=VALUES(profile_image_url);");
-		$statement->bindParam('link_id', $link_id);
-		$statement->bindParam('id_str', $id_str);
-		$statement->bindParam('from_user', $from_user);
-		$statement->bindParam('text', $text);
-		$statement->bindParam('profile_image_url', $profile_image_url);
-		$statement->execute();
+		$sth = $dbh->prepare("INSERT INTO openfuego_tweets_cache (link_id, id_str, screen_name, text, profile_image_url) VALUES (:link_id, :id_str, :screen_name, :text, :profile_image_url) ON DUPLICATE KEY UPDATE id_str=VALUES(id_str), screen_name=VALUES(screen_name), text=VALUES(text), profile_image_url=VALUES(profile_image_url);");
+		$sth->bindParam('link_id', $link_id);
+		$sth->bindParam('id_str', $id_str);
+		$sth->bindParam('screen_name', $screen_name);
+		$sth->bindParam('text', $text);
+		$sth->bindParam('profile_image_url', $profile_image_url);
+		$sth->execute();
 
 	} catch (PDOException $e) {
-		openfuego_notify('PDO exception in ' . __FILE__ . ', ' . __LINE__, $e . "\n\n link_id: $link_id \n\n id_str: $id_str \n\n from_user: $from_user \n\n text: $text \n\n profile_image_url: $profile_image_url");
+		openfuego_notify('PDO exception in ' . __FILE__ . ', ' . __LINE__, $e . "\n\n link_id: $link_id \n\n id_str: $id_str \n\n screen_name: $screen_name \n\n text: $text \n\n profile_image_url: $profile_image_url");
 
 		return FALSE;
 	}
 
-	$tweet = array('id_str' => $id_str, 'from_user' => $from_user, 'text' => $text, 'profile_image_url' => $profile_image_url);
-	$tweet['tweet_url'] = 'http://twitter.com/' . $from_user . '/statuses/' . $id_str . '/';
+	$tweet = array('id_str' => $id_str, 'screen_name' => $screen_name, 'text' => $text, 'profile_image_url' => $profile_image_url);
+	$tweet['tweet_url'] = 'http://twitter.com/' . $screen_name . '/status/' . $id_str . '/';
 	$tweet['profile_image_url_bigger'] = str_replace('_normal.', '_bigger.', $profile_image_url);
 	
  return $tweet;
@@ -744,7 +605,7 @@ function openfuego_tweet_quality_filter($search_result) {
 		if ($rest_status['retweeted_status']) {	
 			$search_result = $rest_status['retweeted_status'];
 			$search_result['profile_image_url'] = $search_result['user']['profile_image_url'];
-			$search_result['from_user'] = $search_result['user']['screen_name'];
+			$search_result['screen_name'] = $search_result['user']['screen_name'];
 			return $search_result;
 		}
 	}
