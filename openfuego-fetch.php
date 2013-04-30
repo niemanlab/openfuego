@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS `openfuego_short_links` (
 CREATE TABLE IF NOT EXISTS `openfuego_tweets_cache` (
   `link_id` mediumint(8) unsigned NOT NULL,
   `id_str` bigint(20) unsigned NOT NULL,
-  `from_user` varchar(15) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `screen_name` varchar(15) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `text` varchar(140) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `profile_image_url` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
