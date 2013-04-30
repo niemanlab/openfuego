@@ -238,9 +238,11 @@ class OpenFuegoQueueConsumer {
 		}
 */
 
+/*
 		if (array_key_exists('retweeted_status', $status)) {
 			$status = $status['retweeted_status'];
 		}
+*/
 		
 		openfuego_process_urls($status);
 		
