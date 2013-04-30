@@ -591,34 +591,6 @@ function openfuego_update_tweet($link_id) {
 }
 
 
-function openfuego_tweet_quality_filter($search_result) {
-
-	if (strpos($search_result['text'], 'RT @') !== FALSE) {
-		$twitter = openfuego_twitter_connect();
-		$rest_status = $twitter->get("statuses/show/{$search_result['id_str']}", array('include_entities' => false));
-		if ($twitter->http_code > 200) {
-			echo '<!-- Twitter error ' . $twitter->http_code . ' -->';
-			openfuego_notify('Twitter error ' . $twitter->http_code, __FUNCTION__ . "\n\n" . $twitter->url . "\n\n" . njl_curl($twitter->url));
-			return FALSE;
-		}
-
-		if ($rest_status['retweeted_status']) {	
-			$search_result = $rest_status['retweeted_status'];
-			$search_result['profile_image_url'] = $search_result['user']['profile_image_url'];
-			$search_result['screen_name'] = $search_result['user']['screen_name'];
-			return $search_result;
-		}
-	}
-
-	if (strpos($search_result['text'], 'RT @') === FALSE && substr_count($search_result['text'], '://') == 1) {	
-		return $search_result;
-
-	} else {
-		return FALSE;
-	}
-}
-
-
 function openfuego_last_updated($format = NULL) {
 
 	$dbh = openfuego_get_dbh();
