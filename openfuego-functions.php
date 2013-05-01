@@ -125,6 +125,7 @@ function openfuego_curl($url, $method = 'GET', $headers = FALSE, $range = 0) {
 
 	$options = array(
 		CURLOPT_USERAGENT => OPENFUEGO_USER_AGENT,
+		CURLOPT_REFERER => 'http://www.google.com/',
 		CURLOPT_CONNECTTIMEOUT => 15,
 		CURLOPT_TIMEOUT => 15,
 		CURLOPT_RETURNTRANSFER => TRUE,
@@ -194,6 +195,7 @@ function openfuego_get_http_location($url, $max_redirects = 10) {
 	$ci = curl_init();
 
 	curl_setopt($ci, CURLOPT_USERAGENT, $useragent);
+	curl_setopt($ci, CURLOPT_REFERER, 'http://www.google.com/');
 	curl_setopt($ci, CURLOPT_CONNECTTIMEOUT, 10);
 	curl_setopt($ci, CURLOPT_TIMEOUT, 10);
 	curl_setopt($ci, CURLOPT_RETURNTRANSFER, TRUE);
