@@ -119,12 +119,28 @@ function read_body($ch, $chunk) {
 }
 
 
-function openfuego_curl($url, $method = 'GET', $headers = FALSE, $range = 0) {
+function openfuego_curl($url, $method = 'GET', $headers = FALSE, $limit = FALSE) {
 
 	$ch = curl_init($url);
 
+	$writefn = function($ch, $chunk) {
+	  static $limit = 5000;
+
+	  static $data = '';
+		global $data; // There is probably a better way to do this.
+	
+	  $len = strlen($data) + strlen($chunk);
+	  if ($len >= $limit ) {
+	    $data .= substr($chunk, 0, $limit-strlen($data));
+	    return -1;
+	  }
+	
+	  $data .= $chunk;
+	  return strlen($chunk);
+	};
+
 	$options = array(
-		CURLOPT_USERAGENT => OPENFUEGO_USER_AGENT,
+		CURLOPT_USERAGENT => 'hi',
 		CURLOPT_REFERER => 'http://www.google.com/',
 		CURLOPT_CONNECTTIMEOUT => 15,
 		CURLOPT_TIMEOUT => 15,
@@ -140,49 +156,26 @@ function openfuego_curl($url, $method = 'GET', $headers = FALSE, $range = 0) {
 		CURLOPT_NOBODY => $headers,
 	);
 		
-	if ($range) {
-		$options[CURLOPT_RANGE] = "0-5000"; // get the first $range bytes of the document
-		$options[CURLOPT_WRITEFUNCTION] = 'read_body';
-	}
-/*
-	if ($range) {
-	
-		$writefn = function($ch, $chunk) {
-		  static $range = 10000;
-		  static $data = '';
-		
-		  $len = strlen($data) + strlen($chunk);
-		  if ($len >= $range) {
-		    $data .= substr($chunk, 0, $range-strlen($data));
-		    return -1;
-		  }
-		
-		  $data .= $chunk;
-		  return strlen($chunk);
-		};
-
-		$options[CURLOPT_RANGE] = "0-10000"; // get the first $range bytes of the document
-		$options[CURLOPT_WRITEFUNCTION] = 'read_body';
-	}
-*/
-
 	curl_setopt_array($ch, $options);
 
-	$response = curl_exec($ch);
+	if ($limit) {
+		curl_setopt(
+		    $ch, 
+		    CURLOPT_WRITEFUNCTION, 
+		    $writefn
+		);
+	}
+
+	curl_exec($ch);
         
+/*
 	if (mb_detect_encoding($response, NULL, TRUE) == 'ASCII') {
 		$response = utf8_encode($response);
 	}
+*/
 
-	if ($headers == FALSE) {
-		curl_close ($ch);
-		return $response;
-
-	} else {
-		$info = curl_getinfo($ch);
-		curl_close ($ch);
-		return $info;
-	}
+	global $data;
+	return $data;
 }
 
 
