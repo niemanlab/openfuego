@@ -13,7 +13,7 @@ else
 
 define('OPENFUEGO_DB_DRIVER',		'mysql');
 
-define('OPENFUEGO_USER_AGENT',		'OpenFuegoBot');
+define('OPENFUEGO_USER_AGENT', 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)');
 
 define('OPENFUEGO_RESOURCES_DIR',	OPENFUEGO_DIR . '/resources');
 
