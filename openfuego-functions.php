@@ -396,28 +396,28 @@ function openfuego_get_items($quantity = 10, $hours = 24, $scoring = TRUE, $meta
 		$openfuego_items_filtered[$i]['domain'] = $domain;
 
 		$openfuego_items_filtered[$i]['rank'] = $i+1;
+			
+		$status = openfuego_get_tweet($link_id);
 
-		if ($metadata && defined('OPENFUEGO_EMBEDLY_API_KEY') && OPENFUEGO_EMBEDLY_API_KEY) {
-			
-			$status = openfuego_get_tweet($link_id);
-	
-			$tw_id_str = $status['id_str'];
-			$tw_screen_name = $status['screen_name'];
-			$tw_text = $status['text'];
-			$tw_profile_image_url = $status['profile_image_url'];
-			$tw_profile_image_url_bigger = str_replace('_normal.', '_bigger.', $tw_profile_image_url);
-			$tw_tweet_url = 'https://twitter.com/' . $tw_screen_name . '/status/' . $tw_id_str;
-	
-			$openfuego_items_filtered[$i]['tw_id_str'] = $tw_id_str;
-	 		$openfuego_items_filtered[$i]['tw_screen_name'] = $tw_screen_name;
-			$openfuego_items_filtered[$i]['tw_text'] = $tw_text;
-			$openfuego_items_filtered[$i]['tw_profile_image_url'] = $tw_profile_image_url;
-			$openfuego_items_filtered[$i]['tw_profile_image_url_bigger'] = $tw_profile_image_url_bigger;
-			$openfuego_items_filtered[$i]['tw_tweet_url'] = $tw_tweet_url;
-			
+		$tw_id_str = $status['id_str'];
+		$tw_screen_name = $status['screen_name'];
+		$tw_text = $status['text'];
+		$tw_profile_image_url = $status['profile_image_url'];
+		$tw_profile_image_url_bigger = str_replace('_normal.', '_bigger.', $tw_profile_image_url);
+		$tw_tweet_url = 'https://twitter.com/' . $tw_screen_name . '/status/' . $tw_id_str;
+
+		$openfuego_items_filtered[$i]['tw_id_str'] = $tw_id_str;
+ 		$openfuego_items_filtered[$i]['tw_screen_name'] = $tw_screen_name;
+		$openfuego_items_filtered[$i]['tw_text'] = $tw_text;
+		$openfuego_items_filtered[$i]['tw_profile_image_url'] = $tw_profile_image_url;
+		$openfuego_items_filtered[$i]['tw_profile_image_url_bigger'] = $tw_profile_image_url_bigger;
+		$openfuego_items_filtered[$i]['tw_tweet_url'] = $tw_tweet_url;
+
+		if ($link_meta) {
 			$openfuego_items_filtered[$i]['metadata'] = $link_meta[$i];
-			unset($openfuego_items_filtered[$i]['html']);
 		}
+		
+		unset($openfuego_items_filtered[$i]['html']);
 	}
 
  return $openfuego_items_filtered;
