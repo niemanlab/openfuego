@@ -314,8 +314,8 @@ function openfuego_get_items($quantity = 10, $hours = 24, $scoring = TRUE, $meta
 
 	foreach ($openfuego_items as $openfuego_item) {
 	
-		$link_id = $openfuego_item['link_id'];
-			
+		$link_id = (int)$openfuego_item['link_id'];
+		
 		$url = $openfuego_item['url'];
 /* 		$url_encoded = urlencode($url); */
 		$weighted_count = $openfuego_item['weighted_count'];
