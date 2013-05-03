@@ -169,8 +169,10 @@ class OpenFuegoQueueConsumer {
 	  foreach ($queueFiles as $queueFile) {
 		$this->processQueueFile($queueFile);
   	    
+/*
   	    pcntl_signal_dispatch();
   	    if ($this->shouldStop()) exit;
+*/
 	  }
 
 	  // Wait until ready for next check
@@ -216,9 +218,11 @@ class OpenFuegoQueueConsumer {
 			continue; // skip it
 		}
 
-		if ((strtotime($status['created_at']) - time()) > (OPENFUEGO_EXPIRATION_INT * 60 * 60)) {
+/*
+		if ((strtotime($status['created_at']) - time()) > (OPENFUEGO_EXPIRATION_INT * 60 * 60)) { // Can't remember why this is here, but it makes no sense
 			continue; // skip it
 		}
+*/
 		  	
 		if (array_key_exists(0, $status['entities']['urls']) == FALSE) { // if tweet does not contain link
 			continue;	// skip it
@@ -260,6 +264,10 @@ class OpenFuegoQueueConsumer {
 	unset($rawStatus);
 	unlink($queueFile);
 	
+	pcntl_signal_dispatch();
+	if ($this->shouldStop())
+		exit;
+
   }
   
   /**

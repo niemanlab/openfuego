@@ -425,19 +425,19 @@ function openfuego_expand($input_url) {
 
 	$url = urldecode($input_url);
 	
-	openfuego_echo("\nurl: $input_url");
+	openfuego_echo("\n$input_url");
 	
 	$url = urlencode($input_url);
 		
 	if (openfuego_strpos_arr($input_url, $openfuego_short_domains, '://', '/')) {
-		openfuego_echo(" (pre-defined short url) "); // instagram, vimeo, mlkshk...
+		openfuego_echo(" (pre-defined short url)\n"); // instagram, vimeo, mlkshk...
 		return $input_url;
 	}
 	
 	elseif (strpos($input_url, '://' . 'youtu.be' . '/')) {
 
 		$canonical_url = 'http://www.youtube.com/watch?v=' . str_replace('http://youtu.be/', '', $input_url);
-		openfuego_echo(" (youtube)");
+		openfuego_echo(" (youtube)\n");
 		return $canonical_url;
 	}
 
@@ -451,7 +451,7 @@ function openfuego_expand($input_url) {
 	$cached_url = $sth->fetchColumn(0);
 
 	if ($cached_url) {	// if it exists in cache...
-		openfuego_echo(" (cached)");
+		openfuego_echo(" (cached)\n");
 		return $cached_url;
 	}
 
@@ -460,34 +460,32 @@ function openfuego_expand($input_url) {
 	if (strlen($input_url) > 36): // if the URL is unshortened
 
 		$long_url = $input_url;
-//		$canonical_url = openfuego_get_canonical($input_url);
-		openfuego_echo(" (already expanded)");
+		openfuego_echo(" (already expanded)\n$long_url\n");
 	
 	elseif (strpos($input_url, '://' . 'is.gd' . '/')):
 	
 		$long_url = openfuego_isgd_expand($input_url);
-		openfuego_echo(" (isgd)");
+		openfuego_echo(" (isgd)\n$long_url\n");
 		
 	elseif (strpos($input_url, '://' . 'goo.gl' . '/') && defined('OPENFUEGO_GOOGL_API_KEY') && OPENFUEGO_GOOGL_API_KEY):
 	
 		$long_url = openfuego_googl_expand($input_url);
-		openfuego_echo(" (googl)");
+		openfuego_echo(" (googl)\n$long_url\n");
 
 	elseif (strpos($input_url, '://' . 'su.pr' . '/')):
 
 		$long_url = openfuego_supr_expand($input_url);
-		openfuego_echo(" (supr)");
+		openfuego_echo(" (supr)\n$long_url\n");
 		
-	// list of known Bitly Pro domains specified in openfuego-config
+	// list of known Bitly Pro domains specified in openfuego-settings
 	elseif (openfuego_strpos_arr($input_url, $openfuego_bitly_pro_domains, '://', '/') && defined('OPENFUEGO_BITLY_API_KEY') && OPENFUEGO_BITLY_API_KEY):
 	
 		$long_url = openfuego_bitly_expand($input_url);
-	//	$long_url = openfuego_get_http_location($long_url); // to deal with trib.al urls
-		openfuego_echo(" (bitly)");
+		openfuego_echo(" (bitly)\n$long_url\n");
 		
 	else:
 		$long_url = openfuego_get_http_location($input_url);
-		openfuego_echo(" (headers)");
+		openfuego_echo(" (headers)\n$long_url\n");
 	
 	endif;
 	
@@ -506,6 +504,7 @@ function openfuego_expand($input_url) {
 			$sth->bindParam(':output_url', $output_url);
 			$sth->execute();
 			
+			openfuego_echo("$output_url\n");
 			return $output_url;
 
 		} catch (PDOException $e) {

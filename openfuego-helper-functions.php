@@ -70,6 +70,8 @@ function openfuego_notify($subject, $body = NULL) {
 
 function openfuego_curl($url, $method = 'GET', $headers = FALSE, $limit = FALSE) {
 
+	$data = null;
+
 	$ch = curl_init($url);
 
 	$options = array(
@@ -96,7 +98,7 @@ function openfuego_curl($url, $method = 'GET', $headers = FALSE, $limit = FALSE)
 			static $limit = 7000;
 	
 			static $data = '';
-		global $data; // There is probably a better way to do this.
+			global $data; // There is probably a better way to do this.
 		
 			$len = strlen($data) + strlen($chunk);
 			if ($len >= $limit ) {
@@ -188,7 +190,7 @@ function openfuego_get_canonical($url) {
 	
 	$url = str_replace('www10.', 'www.', $url); // NYT paywall handling	
 					
-	$source = openfuego_curl($url, 'GET', FALSE, 10000);
+	$source = openfuego_curl($url, 'GET', FALSE, TRUE);
 
 	$doc = new DOMDocument();
 	@$doc->loadHTML($source);
