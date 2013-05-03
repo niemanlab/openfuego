@@ -320,9 +320,12 @@ function openfuego_update_tweet($link_id) {
 					break 2;
 				}
 			}
-		}		
+		}
+		else {
+			return false; // no results. not sure what else to do, really.
+		}			
 	}
-
+	
 	$id_str = $search_result['user']['id_str'];
 	$screen_name = $search_result['user']['screen_name'];
 	$profile_image_url = $search_result['user']['profile_image_url'];
