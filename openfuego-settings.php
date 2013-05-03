@@ -52,6 +52,7 @@ $openfuego_bitly_pro_domains = array(
 $openfuego_short_domains = array( // These domains' canonical URLs are already short, so we don't need to look them up.
 	'twitpic.com',
 	'instagr.am',
+	'instagram.com',
 	'yfrog.com',
 	'twitpic.com',
 	'vimeo.com',
@@ -63,6 +64,10 @@ $openfuego_short_domains = array( // These domains' canonical URLs are already s
 
 require_once(OPENFUEGO_SHORTENERS_DIR . '/shorteners-config.php');
 require_once(OPENFUEGO_TWITTER_DIR . '/twitter-oauth.php');
+
+if (file_exists(OPENFUEGO_DIR . '/openfuego-overrides.php')) {
+	include(OPENFUEGO_DIR . '/openfuego-overrides.php');
+}
 
 require_once(OPENFUEGO_DIR . '/openfuego-functions.php');
 ?>

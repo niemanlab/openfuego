@@ -23,8 +23,8 @@ date_default_timezone_set('America/New_York');
 define('OPENFUEGO_DB_NAME', 'XXXX');
 define('OPENFUEGO_DB_USER', 'XXXX');
 define('OPENFUEGO_DB_PASS', 'XXXX');
-define('OPENFUEGO_DB_HOST', 'localhost');	// if you don't know, localhost
-define('OPENFUEGO_DB_PORT', 3306);		 	// if you don't know, 3306
+define('OPENFUEGO_DB_HOST', 'localhost'); // if you don't know, localhost
+define('OPENFUEGO_DB_PORT', 3306); // if you don't know, 3306
 
 /** Time to curate.
   * Specify the usernames of authorities at the center of OpenFuego's universe.
@@ -52,27 +52,27 @@ define('OPENFUEGO_EXPIRATION_INT', 1); //
   * Click "Create an app" and follow the instructions. Create an app with READ and WRITE access.
   * Then generate new access tokens. Don't share the secrets with anyone.
 **/
-define('OPENFUEGO_TW_SCREEN_NAME',			'xxxx');
-define('OPENFUEGO_TW_CONSUMER_KEY',			'xxxx');
-define('OPENFUEGO_TW_CONSUMER_SECRET',		'xxxx');
-define('OPENFUEGO_TW_ACCESS_TOKEN',			'xxxx-xxxx');
-define('OPENFUEGO_TW_ACCESS_TOKEN_SECRET',	'xxxx');
+define('OPENFUEGO_TW_SCREEN_NAME', 'xxxx');
+define('OPENFUEGO_TW_CONSUMER_KEY', 'xxxx');
+define('OPENFUEGO_TW_CONSUMER_SECRET', 'xxxx');
+define('OPENFUEGO_TW_ACCESS_TOKEN', 'xxxx-xxxx');
+define('OPENFUEGO_TW_ACCESS_TOKEN_SECRET', 'xxxx');
 
 /** Your Bitly credentials. Visit this page to grab them: http://bitly.com/a/your_api_key 
   * Optional, recommended. Leave blank to disable.
 **/
-define('OPENFUEGO_BITLY_USERNAME',	'');
-define('OPENFUEGO_BITLY_API_KEY',	'');
+define('OPENFUEGO_BITLY_USERNAME', '');
+define('OPENFUEGO_BITLY_API_KEY', '');
 
 /** Your Goo.gl API credentials. Visit this page for instructions: https://developers.google.com/url-shortener/v1/getting_started#APIKey 
   * Optional, recommended.
 **/
-define('OPENFUEGO_GOOGL_API_KEY',	''); // Optional, recommended. Leave blank to disable.
+define('OPENFUEGO_GOOGL_API_KEY', ''); // Optional, recommended. Leave blank to disable.
 
 /** Your Embed.ly API credentials. Visit this page for a free account: http://embed.ly/embed/pricing 
   * Optional, but required for OpenFuego to return metadata with URLs.
 **/
-define('OPENFUEGO_EMBEDLY_API_KEY',	''); // Optional, recommended. Leave blank to disable.
+define('OPENFUEGO_EMBEDLY_API_KEY', ''); // Optional, recommended. Leave blank to disable.
 
 
 /**
