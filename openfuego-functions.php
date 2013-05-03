@@ -99,26 +99,6 @@ function openfuego_clean_up() {
  }
 
 
-function read_body($ch, $chunk) {
-  static $range = 5000;
-  static $data = '';
-/* 		  static $limit = 10000; */
-
-  $len = strlen($data) + strlen($chunk);
-  if ($len >= $range) {
-    $data .= substr($chunk, 0, $range-strlen($data));
-//    print_r($data);
-//   echo strlen($data) . ' ' . $data;
-//    return -1;
-			return $data;
-  }
-
-  $data .= $chunk;
-  
-  return strlen($chunk);
-}
-
-
 function openfuego_curl($url, $method = 'GET', $headers = FALSE, $limit = FALSE) {
 
 	$ch = curl_init($url);
@@ -144,7 +124,7 @@ function openfuego_curl($url, $method = 'GET', $headers = FALSE, $limit = FALSE)
 
 	if ($limit) {
 		$writefn = function($ch, $chunk) {
-			static $limit = 5000;
+			static $limit = 7000;
 	
 			static $data = '';
 		global $data; // There is probably a better way to do this.
@@ -237,15 +217,6 @@ function openfuego_get_canonical($url) {
 		$url = strstr($url, '#utm_', TRUE);
 	}
 	
-	// This is an exceptionally dumb workaround. HTTP 1.1 servers allow OpenFuego's curl function to request
-	// only the first X bytes of a document. But HTTP 1.0 servers ignore this request and return the whole
-	// file. I can't figure out how to abort the download after X bytes on HTTP 1.0 servers, so if the
-	// resource is a 30 MB PDF file, the app runs out of memory. Therefore don't try to curl files of these
-	// types. Of course, there are infinite numbers of file types not to curl, so this isn't a good solution!
-	if (preg_match('/^.*\.(jpg|jpeg|png|gif|pdf|mpeg|mp3|mp4|mov|tiff|ogg|zip|tar|gz|flv)$/i', $url)) {
-		return $url;
-	}
-		
 	$url = str_replace('www10.', 'www.', $url); // NYT paywall handling	
 					
 	$source = openfuego_curl($url, 'GET', FALSE, 10000);
