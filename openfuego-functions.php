@@ -140,8 +140,8 @@ function openfuego_curl($url, $method = 'GET', $headers = FALSE, $limit = FALSE)
 	};
 
 	$options = array(
-		CURLOPT_USERAGENT => 'hi',
-		CURLOPT_REFERER => 'http://www.google.com/',
+		CURLOPT_USERAGENT => OPENFUEGO_USER_AGENT,
+		CURLOPT_REFERER => OPENFUEGO_REFERER,
 		CURLOPT_CONNECTTIMEOUT => 15,
 		CURLOPT_TIMEOUT => 15,
 		CURLOPT_RETURNTRANSFER => TRUE,
@@ -159,22 +159,17 @@ function openfuego_curl($url, $method = 'GET', $headers = FALSE, $limit = FALSE)
 	curl_setopt_array($ch, $options);
 
 	if ($limit) {
-		curl_setopt(
-		    $ch, 
-		    CURLOPT_WRITEFUNCTION, 
-		    $writefn
-		);
+		curl_setopt($ch, CURLOPT_WRITEFUNCTION, $writefn);
 	}
 
 	curl_exec($ch);
-        
-/*
-	if (mb_detect_encoding($response, NULL, TRUE) == 'ASCII') {
-		$response = utf8_encode($response);
-	}
-*/
+	
+	global $data; // There is probably a better way to do this.
 
-	global $data;
+	if (mb_detect_encoding($data, NULL, TRUE) == 'ASCII') {
+		$data = utf8_encode($data);
+	}
+
 	return $data;
 }
 
