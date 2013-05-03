@@ -42,12 +42,9 @@ global $argv;
 if (in_array($argv[1], array('-v', '-verbose'))) define('OPENFUEGO_VERBOSE', TRUE);
 */
 
-require_once(OPENFUEGO_DIR . '/openfuego-salsa.php');
-
 $openfuego_bitly_pro_domains = array(
 	'bit.ly','bitly.com','j.mp'
 );
-
 
 $openfuego_short_domains = array( // These domains' canonical URLs are already short, so we don't need to look them up.
 	'twitpic.com',
