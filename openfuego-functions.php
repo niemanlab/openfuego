@@ -174,7 +174,7 @@ function openfuego_get_items($quantity = 10, $hours = 24, $scoring = TRUE, $meta
 		$openfuego_items_filtered[$i]['tw_profile_image_url_bigger'] = $tw_profile_image_url_bigger;
 		$openfuego_items_filtered[$i]['tw_tweet_url'] = $tw_tweet_url;
 
-		if ($link_meta) {
+		if (isset($link_meta)) {
 			$openfuego_items_filtered[$i]['metadata'] = $link_meta[$i];
 		}
 		
@@ -298,7 +298,7 @@ function openfuego_update_tweet($link_id) {
 	
 	$dbh = openfuego_get_dbh();
 
-	$query = $dbh->query("SELECT url, first_user_id FROM openfuego_links WHERE link_id = $link_id;");
+	$query = $dbh->query("SELECT sl.input_url, sl.long_url, l.first_user_id FROM openfuego_links AS l INNER JOIN (openfuego_short_links AS sl) ON (sl.long_url = l.url) WHERE link_id = $link_id;");
 	
 	$rows = $query->fetchAll();
 
@@ -306,10 +306,11 @@ function openfuego_update_tweet($link_id) {
 		
 	foreach ($rows as $row) {
 
-		$url = $row[0];	
-		$first_user_id = $row[1];
+		$input_url = $row[0];	
+		$long_url = $row[1];	
+		$first_user_id = $row[2];
 
-		$search = $twitter->get("search/tweets", array('q' => $url, 'count' => 100));
+		$search = $twitter->get("search/tweets", array('q' => $input_url . ' OR ' . $long_url, 'count' => 100, 'result_type' => 'mixed'));
 		
 		if ($search['statuses']) {
 			$search_results = $search['statuses'];
@@ -319,7 +320,7 @@ function openfuego_update_tweet($link_id) {
 					break 2;
 				}
 			}
-		}
+		}		
 	}
 
 	$id_str = $search_result['user']['id_str'];
