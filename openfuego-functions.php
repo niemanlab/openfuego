@@ -124,8 +124,8 @@ function openfuego_curl($url, $method = 'GET', $headers = FALSE, $limit = FALSE)
 	$ch = curl_init($url);
 
 	$options = array(
-		CURLOPT_USERAGENT => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-		CURLOPT_REFERER => 'http://www.google.com',
+		CURLOPT_USERAGENT => OPENFUEGO_USER_AGENT,
+		CURLOPT_REFERER => OPENFUEGO_REFERER,
 		CURLOPT_CONNECTTIMEOUT => 15,
 		CURLOPT_TIMEOUT => 15,
 		CURLOPT_RETURNTRANSFER => TRUE,
