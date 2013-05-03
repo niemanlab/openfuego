@@ -123,25 +123,9 @@ function openfuego_curl($url, $method = 'GET', $headers = FALSE, $limit = FALSE)
 
 	$ch = curl_init($url);
 
-	$writefn = function($ch, $chunk) {
-	  static $limit = 5000;
-
-	  static $data = '';
-		global $data; // There is probably a better way to do this.
-	
-	  $len = strlen($data) + strlen($chunk);
-	  if ($len >= $limit ) {
-	    $data .= substr($chunk, 0, $limit-strlen($data));
-	    return -1;
-	  }
-	
-	  $data .= $chunk;
-	  return strlen($chunk);
-	};
-
 	$options = array(
-		CURLOPT_USERAGENT => OPENFUEGO_USER_AGENT,
-		CURLOPT_REFERER => OPENFUEGO_REFERER,
+		CURLOPT_USERAGENT => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+		CURLOPT_REFERER => 'http://www.google.com',
 		CURLOPT_CONNECTTIMEOUT => 15,
 		CURLOPT_TIMEOUT => 15,
 		CURLOPT_RETURNTRANSFER => TRUE,
@@ -159,13 +143,37 @@ function openfuego_curl($url, $method = 'GET', $headers = FALSE, $limit = FALSE)
 	curl_setopt_array($ch, $options);
 
 	if ($limit) {
+		$writefn = function($ch, $chunk) {
+			static $limit = 5000;
+	
+			static $data = '';
+		global $data; // There is probably a better way to do this.
+		
+			$len = strlen($data) + strlen($chunk);
+			if ($len >= $limit ) {
+				$data .= substr($chunk, 0, $limit-strlen($data));
+				return -1;
+			}
+		
+			$data .= $chunk;
+			return strlen($chunk);
+		};
+
 		curl_setopt($ch, CURLOPT_WRITEFUNCTION, $writefn);
+		
+		curl_exec($ch);
+		
+		global $data; // There is probably a better way to do this.
+
+		if (mb_detect_encoding($data, NULL, TRUE) == 'ASCII') {
+			$data = utf8_encode($data);
+		}
+
+		return $data;
 	}
 
-	curl_exec($ch);
+	$data = curl_exec($ch);
 	
-	global $data; // There is probably a better way to do this.
-
 	if (mb_detect_encoding($data, NULL, TRUE) == 'ASCII') {
 		$data = utf8_encode($data);
 	}
