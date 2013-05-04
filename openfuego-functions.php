@@ -441,6 +441,7 @@ function openfuego_expand($input_url) {
 
 		$canonical_url = 'http://www.youtube.com/watch?v=' . str_replace('http://youtu.be/', '', $input_url);
 		openfuego_echo(" (youtube)\n");
+		openfuego_echo($canonical_url);
 		return $canonical_url;
 	}
 
@@ -455,6 +456,7 @@ function openfuego_expand($input_url) {
 
 	if ($cached_url) {	// if it exists in cache...
 		openfuego_echo(" (cached)\n");
+		openfuego_echo($cached_url);
 		return $cached_url;
 	}
 
