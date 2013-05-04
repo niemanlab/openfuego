@@ -257,7 +257,7 @@ function openfuego_get_tweet($link_id) {
 					}
 					
 					else {
-//						sleep($try);
+						// sleep($try);
 						$try++;
 						continue; // try again
 					}
@@ -298,32 +298,32 @@ function openfuego_update_tweet($link_id) {
 	
 	$dbh = openfuego_get_dbh();
 
-	$query = $dbh->query("SELECT sl.input_url, sl.long_url, l.first_user_id FROM openfuego_links AS l INNER JOIN (openfuego_short_links AS sl) ON (sl.long_url = l.url) WHERE link_id = $link_id;");
+	$sth = $dbh->query("SELECT sl.input_url, l.url, l.first_user_id FROM openfuego_links AS l LEFT JOIN (openfuego_short_links AS sl) ON (sl.long_url = l.url) WHERE l.link_id = $link_id;");
 	
-	$rows = $query->fetchAll();
+	$row = $sth->fetch(PDO::FETCH_ASSOC);
+
+	$short_url = $row['input_url'];	
+	$long_url = $row['url'];	
+	$first_user_id = $row['first_user_id'];
+	
+	$query = $short_url ? $short_url . ' OR ' . $long_url : $long_url;
 
 	$twitter = openfuego_twitter_connect();
-		
-	foreach ($rows as $row) {
 
-		$input_url = $row[0];	
-		$long_url = $row[1];	
-		$first_user_id = $row[2];
+	$search = $twitter->get("search/tweets", array('q' => $query, 'count' => 100, 'result_type' => 'mixed'));
+	
+	if ($search['statuses']) {
+		$search_results = $search['statuses'];
 
-		$search = $twitter->get("search/tweets", array('q' => $input_url . ' OR ' . $long_url, 'count' => 100, 'result_type' => 'mixed'));
-		
-		if ($search['statuses']) {
-			$search_results = $search['statuses'];
-
-			foreach ($search_results as $search_result) {
-				if ($search_result['user']['id_str'] == $first_user_id) {
-					break 2;
-				}
+		foreach ($search_results as $search_result) {
+			if ($search_result['user']['id_str'] == $first_user_id) {
+				break;
 			}
 		}
-		else {
-			return false; // no results. not sure what else to do, really.
-		}			
+	}
+	else {
+		openfuego_notify('No Twitter search results on openfuego_update_tweet()', 'Query: ' . $twitter->http_code);
+		return false; // no results. not sure what else to do, really.
 	}
 	
 	$id_str = $search_result['user']['id_str'];
