@@ -70,7 +70,8 @@ function openfuego_notify($subject, $body = NULL) {
 
 function openfuego_curl($url, $method = 'GET', $headers = FALSE, $limit = FALSE) {
 
-	$data = null;
+	global $openfuego_curl_data;
+	$openfuego_curl_data = null;
 
 	$ch = curl_init($url);
 
@@ -96,16 +97,16 @@ function openfuego_curl($url, $method = 'GET', $headers = FALSE, $limit = FALSE)
 		$writefn = function($ch, $chunk) {
 			static $limit = 10000;
 	
-			static $data = '';
-			global $data; // There is probably a better way to do this.
+			static $openfuego_curl_data = '';
+			global $openfuego_curl_data; // There is probably a better way to do this.
 		
-			$len = strlen($data) + strlen($chunk);
+			$len = strlen($openfuego_curl_data) + strlen($chunk);
 			if ($len >= $limit ) {
-				$data .= substr($chunk, 0, $limit-strlen($data));
+				$openfuego_curl_data .= substr($chunk, 0, $limit-strlen($openfuego_curl_data));
 				return -1;
 			}
 		
-			$data .= $chunk;
+			$openfuego_curl_data .= $chunk;
 			return strlen($chunk);
 		};
 
@@ -113,52 +114,52 @@ function openfuego_curl($url, $method = 'GET', $headers = FALSE, $limit = FALSE)
 		
 		curl_exec($ch);
 		
-		global $data; // There is probably a better way to do this.
+		global $openfuego_curl_data; // There is probably a better way to do this.
 
-		if (mb_detect_encoding($data, NULL, TRUE) == 'ASCII') {
-			$data = utf8_encode($data);
+		if (mb_detect_encoding($openfuego_curl_data, NULL, TRUE) == 'ASCII') {
+			$openfuego_curl_data = utf8_encode($openfuego_curl_data);
 		}
 
-		return $data;
+		return $openfuego_curl_data;
 	}
 
-	$data = curl_exec($ch);
+	$openfuego_curl_data = curl_exec($ch);
 	
-	if (mb_detect_encoding($data, NULL, TRUE) == 'ASCII') {
-		$data = utf8_encode($data);
+	if (mb_detect_encoding($openfuego_curl_data, NULL, TRUE) == 'ASCII') {
+		$openfuego_curl_data = utf8_encode($openfuego_curl_data);
 	}
 
-	return $data;
+	return $openfuego_curl_data;
 }
 
 
 function openfuego_get_http_location($url, $max_redirects = 10) {
 
-	$useragent = OPENFUEGO_USER_AGENT;
-	$method = 'GET';
-	$headers = TRUE;
+	$ch = curl_init($url);
 
-	$ci = curl_init();
+	$options = array(
+		CURLOPT_USERAGENT => OPENFUEGO_USER_AGENT,
+		CURLOPT_REFERER => OPENFUEGO_REFERER,
+		CURLOPT_CONNECTTIMEOUT => 15,
+		CURLOPT_TIMEOUT => 15,
+		CURLOPT_RETURNTRANSFER => TRUE,
+		CURLOPT_FOLLOWLOCATION => TRUE,
+		// CURLOPT_MAXREDIRS => 10,
+		CURLOPT_AUTOREFERER => TRUE,
+		CURLOPT_SSL_VERIFYPEER => FALSE,
+		CURLOPT_ENCODING => '', // blank supports all encodings
+		CURLOPT_HTTPHEADER => array('Expect:'),
+		CURLOPT_HEADER => TRUE,
+		CURLOPT_NOBODY => TRUE,
+	);
 
-	curl_setopt($ci, CURLOPT_USERAGENT, $useragent);
-	curl_setopt($ci, CURLOPT_REFERER, 'http://www.google.com/');
-	curl_setopt($ci, CURLOPT_CONNECTTIMEOUT, 10);
-	curl_setopt($ci, CURLOPT_TIMEOUT, 10);
-	curl_setopt($ci, CURLOPT_RETURNTRANSFER, TRUE);
-	curl_setopt($ci, CURLOPT_FOLLOWLOCATION, TRUE);
-	curl_setopt($ci, CURLOPT_MAXREDIRS, $max_redirects);
-	curl_setopt($ci, CURLOPT_AUTOREFERER, FALSE);
-	curl_setopt($ci, CURLOPT_SSL_VERIFYPEER, FALSE);
-	curl_setopt($ci, CURLOPT_HTTPHEADER, array('Expect:'));
-	curl_setopt($ci, CURLOPT_HEADER, $headers);
-	curl_setopt($ci, CURLOPT_NOBODY, $headers);
-	curl_setopt($ci, CURLOPT_URL, $url);
+	curl_setopt_array($ch, $options);
 
-	$response = curl_exec($ci);
+	$response = curl_exec($ch);
 		
-	$info = curl_getinfo($ci);
-	curl_close ($ci);
-
+	$info = curl_getinfo($ch);
+	curl_close ($ch);
+	
 	$long_url = $info['url'];
 	
 	if (mb_detect_encoding($long_url, NULL, TRUE) == 'ASCII') {
