@@ -95,7 +95,7 @@ function openfuego_curl($url, $method = 'GET', $headers = FALSE, $limit = FALSE)
 
 	if ($limit) {
 		$writefn = function($ch, $chunk) {
-			static $limit = 7000;
+			static $limit = 10000;
 	
 			static $data = '';
 			global $data; // There is probably a better way to do this.
