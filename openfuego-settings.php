@@ -14,7 +14,7 @@ else
 define('OPENFUEGO_DB_DRIVER',		'mysql');
 
 define('OPENFUEGO_USER_AGENT', 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)');
-define('OPENFUEGO_REFERER', 'http://www.google.com');
+define('OPENFUEGO_REFERER', 'http://google.com');
 
 define('OPENFUEGO_RESOURCES_DIR',	OPENFUEGO_DIR . '/resources');
 
@@ -42,12 +42,9 @@ global $argv;
 if (in_array($argv[1], array('-v', '-verbose'))) define('OPENFUEGO_VERBOSE', TRUE);
 */
 
-require_once(OPENFUEGO_DIR . '/openfuego-salsa.php');
-
 $openfuego_bitly_pro_domains = array(
 	'bit.ly','bitly.com','j.mp'
 );
-
 
 $openfuego_short_domains = array( // These domains' canonical URLs are already short, so we don't need to look them up.
 	'twitpic.com',
