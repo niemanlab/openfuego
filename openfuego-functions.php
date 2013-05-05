@@ -47,7 +47,7 @@ function openfuego_get_items($quantity = 10, $hours = 24, $scoring = TRUE, $meta
 	
 	$quantity = (int)$quantity;
 	$hours = (int)$hours;
-//	$scoring = (int)$scoring;
+	// $scoring = (int)$scoring;
 
 	$date = date('Y-m-d H:i:s', $now);	
 
@@ -124,6 +124,9 @@ function openfuego_get_items($quantity = 10, $hours = 24, $scoring = TRUE, $meta
 	$openfuego_items_filtered = array_slice($openfuego_items_filtered, 0, $quantity);
 
 	if ($metadata && defined('OPENFUEGO_EMBEDLY_API_KEY') && OPENFUEGO_EMBEDLY_API_KEY) {
+
+		$metadata_params = is_array($metadata) ? $metadata : NULL;
+		
 		foreach ($openfuego_items_filtered as $openfuego_item_filtered) {
 			$urls[] = $openfuego_item_filtered['url'];
 		}
@@ -131,7 +134,7 @@ function openfuego_get_items($quantity = 10, $hours = 24, $scoring = TRUE, $meta
 		$link_meta = array();
 		$urls_chunked = array_chunk($urls, 20); // Embedly handles maximum 20 URLs per request
 		foreach ($urls_chunked as $urls_chunk) {
-			$link_meta_chunk = openfuego_get_metadata($urls_chunk);
+			$link_meta_chunk = openfuego_get_metadata($urls_chunk, $metadata_params);
 			$link_meta_chunk = json_decode($link_meta_chunk, TRUE);
 			$link_meta = array_merge($link_meta, $link_meta_chunk);
 		}
