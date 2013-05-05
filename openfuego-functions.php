@@ -164,8 +164,13 @@ function openfuego_get_items($quantity = 10, $hours = 24, $scoring = TRUE, $meta
 		$tw_screen_name = $status['screen_name'];
 		$tw_text = $status['text'];
 		$tw_profile_image_url = $status['profile_image_url'];
-		$tw_profile_image_url_bigger = str_replace('_normal.', '_bigger.', $tw_profile_image_url);
-		$tw_tweet_url = 'https://twitter.com/' . $tw_screen_name . '/status/' . $tw_id_str;
+		$tw_profile_image_url_bigger = null;
+		$tw_tweet_url = null;
+		
+		if ($tw_profile_image_url && $tw_screen_name && $tw_id_str) {
+			$tw_profile_image_url_bigger = str_replace('_normal.', '_bigger.', $tw_profile_image_url);
+			$tw_tweet_url = 'https://twitter.com/' . $tw_screen_name . '/status/' . $tw_id_str;
+		}
 
 		$openfuego_items_filtered[$i]['tw_id_str'] = $tw_id_str;
  		$openfuego_items_filtered[$i]['tw_screen_name'] = $tw_screen_name;
@@ -234,61 +239,43 @@ function openfuego_get_tweet($link_id) {
 			$twitter = openfuego_twitter_connect();
 			$status = $twitter->get("statuses/show/$id_str", array('include_entities' => false));
 
-			if ($twitter->http_code == 200) {
+			if (preg_match("/2../", $twitter->http_code)) {
 				$id_str = $status['id_str'];
 				$screen_name = $status['user']['screen_name'];
 				$text = $status['text'];
 				$profile_image_url = $status['user']['profile_image_url'];
+
+				try {
+					$sth = $dbh->prepare("INSERT IGNORE INTO openfuego_tweets_cache (link_id, id_str, screen_name, text, profile_image_url) VALUES (:link_id, :id_str, :screen_name, :text, :profile_image_url);");
+					$sth->bindParam('link_id', $link_id);
+					$sth->bindParam('id_str', $id_str);
+					$sth->bindParam('screen_name', $screen_name);
+					$sth->bindParam('text', $text);
+					$sth->bindParam('profile_image_url', $profile_image_url);
+					$sth->execute();
+		
+				} catch (PDOException $e) {
+					openfuego_notify('OpenFuego exception in ' . __FUNCTION__, $e);
+					return FALSE;
+				}
 			}
 
-			elseif ($twitter->http_code == 403 || $twitter->http_code == 404) {
+			elseif (preg_match("/4../", $twitter->http_code)) {
 				$status = openfuego_update_tweet($link_id);
 				$id_str = $status['id_str'];
 				$screen_name = $status['screen_name'];
 				$text = $status['text'];
 				$profile_image_url = $status['profile_image_url'];
 			}
-			
-			elseif ($twitter->http_code == 503) {
-				$try = 1;
-				while ($try <= 2) {
-					if ($status = $twitter->get("statuses/show/$id_str", array('include_entities' => false)) && $twitter->http_code == 200) {
-						break; // all set
-					}
-					
-					else {
-						// sleep($try);
-						$try++;
-						continue; // try again
-					}
-				}
-			}
-			
+						
 			else {
 				openfuego_notify('OpenFuego exception in ' . __FUNCTION__, $twitter->http_code . "\n\n" . $twitter->url . "\n\n" . openfuego_curl($twitter->url));
 				return FALSE;
 			}
 		}
-
-		try {
-			$sth = $dbh->prepare("INSERT IGNORE INTO openfuego_tweets_cache (link_id, id_str, screen_name, text, profile_image_url) VALUES (:link_id, :id_str, :screen_name, :text, :profile_image_url);");
-/* 		$sth = $dbh->prepare("INSERT INTO openfuego_tweets_cache (link_id, id_str, screen_name, text, profile_image_url) VALUES (:link_id, :id_str, :screen_name, :text, :profile_image_url); UNLOCK TABLES"); */
-			$sth->bindParam('link_id', $link_id);
-			$sth->bindParam('id_str', $id_str);
-			$sth->bindParam('screen_name', $screen_name);
-			$sth->bindParam('text', $text);
-			$sth->bindParam('profile_image_url', $profile_image_url);
-			$sth->execute();
-
-		} catch (PDOException $e) {
-			openfuego_notify('OpenFuego exception in ' . __FUNCTION__, $e);
-			return FALSE;
-		}
 	}
 
 	$tweet = array('id_str' => $id_str, 'screen_name' => $screen_name, 'text' => $text, 'profile_image_url' => $profile_image_url);
-	$tweet['tweet_url'] = 'http://twitter.com/' . $screen_name . '/statuses/' . $id_str . '/';
-	$tweet['profile_image_url_bigger'] = str_replace('_normal.', '_bigger.', $profile_image_url);
 		
 	return $tweet;
 }
@@ -347,8 +334,6 @@ function openfuego_update_tweet($link_id) {
 	}
 
 	$tweet = array('id_str' => $id_str, 'screen_name' => $screen_name, 'text' => $text, 'profile_image_url' => $profile_image_url);
-	$tweet['tweet_url'] = 'http://twitter.com/' . $screen_name . '/status/' . $id_str . '/';
-	$tweet['profile_image_url_bigger'] = str_replace('_normal.', '_bigger.', $profile_image_url);
 	
  return $tweet;
 }
