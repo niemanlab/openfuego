@@ -342,23 +342,22 @@ function openfuego_update_tweet($link_id) {
 }
 
 
-function openfuego_last_updated($format = NULL) {
+function openfuego_last_updated() {
 
 	$dbh = openfuego_get_dbh();
 
 	try {
-		$sth = $dbh->prepare("SELECT UPDATE_TIME FROM information_schema.tables WHERE TABLE_SCHEMA = 'openfuego' AND TABLE_NAME = 'openfuego_tweets_last';");
+		$sth = $dbh->prepare('SELECT last_seen FROM openfuego_links ORDER BY last_seen DESC LIMIT 1;');
 		$sth->execute();
 		$updated = $sth->fetchColumn(0);	
 		$updated = strtotime($updated);
 		return $updated;
 
 	} catch (PDOException $e) {
-		openfuego_notify('OpenFuego exception in ' . __FUNCTION__, $e);
+		openfuego_notify('Could not get last_updated', $e);
 		return FALSE;
 	}
 }
-
 
 function openfuego_populate_universe($authorities, $min_influence = 1) {
 
