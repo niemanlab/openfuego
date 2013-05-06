@@ -42,7 +42,7 @@ $openfuego_authorities = array(
 	'authority9',
 );
 
-/** Your email address, for error reporting. */
+/** Your email address, for error reporting. You can include multiple addresses separated by commas. */
 define('OPENFUEGO_WEBMASTER', 'xxxx@harvard.edu');
 
 /** How many days should OpenFuego keep links in its database? Default is 1 (24 hours). Must be an integer. */
