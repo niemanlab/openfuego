@@ -312,7 +312,7 @@ function openfuego_update_tweet($link_id) {
 		}
 	}
 	else {
-		openfuego_notify('No Twitter search results on openfuego_update_tweet()', 'Query: ' . $twitter->http_code);
+		openfuego_notify('No Twitter search results on openfuego_update_tweet()', 'Query: ' . $twitter->url);
 		return false; // no results. not sure what else to do, really.
 	}
 	
