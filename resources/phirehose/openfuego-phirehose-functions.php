@@ -3,6 +3,11 @@
 require_once(OPENFUEGO_PHIREHOSE_DIR . '/lib/Phirehose.php');
 require_once(OPENFUEGO_PHIREHOSE_DIR . '/lib/OauthPhirehose.php');
 
+define('TWITTER_CONSUMER_KEY', OPENFUEGO_TW_CONSUMER_KEY);
+define('TWITTER_CONSUMER_SECRET', OPENFUEGO_TW_CONSUMER_SECRET);
+define('OAUTH_TOKEN', OPENFUEGO_TW_ACCESS_TOKEN);
+define('OAUTH_SECRET',  OPENFUEGO_TW_ACCESS_TOKEN_SECRET);
+
 class OpenFuegoQueueCollector extends OauthPhirehose {
 	/**
 	* Subclass specific constants
@@ -118,7 +123,13 @@ class OpenFuegoQueueCollector extends OauthPhirehose {
 		// $this->log('Successfully rotated active stream to queue file: ' . $queueFile) . "\n";
 	}
 	
-} // End of class
+	protected function log($message,$level='notice')
+	{
+		// @error_log('Phirehose: ' . $message, 0);
+	}
+
+	
+} // End of OpenFuegoQueueCollector class
 
 
 class OpenFuegoQueueConsumer {
@@ -278,9 +289,10 @@ class OpenFuegoQueueConsumer {
    *
    *
    */
-   	protected function log($message) {
-		@error_log($message, 3);
-	}
+  protected function log($message,$level='notice')
+  {
+    // @error_log('Phirehose: ' . $message, 0);
+  }
 	
 	// NEED LOG ROTATION SCRIPT
 

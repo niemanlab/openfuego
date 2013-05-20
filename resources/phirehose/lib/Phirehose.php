@@ -205,7 +205,7 @@ abstract class Phirehose
    *
    * @param array $trackWords
    */
-  public function setTrack($trackWords)
+  public function setTrack(array $trackWords)
   {
     $trackWords = ($trackWords === NULL) ? array() : $trackWords;
     sort($trackWords); // Non-optimal, but necessary
@@ -360,7 +360,7 @@ abstract class Phirehose
     
     // Loop indefinitely based on reconnect
     do {
-
+      
       // (Re)connect
       $this->reconnect();
     
@@ -370,7 +370,6 @@ abstract class Phirehose
       
       // We use a blocking-select with timeout, to allow us to continue processing on idle streams
       while ($this->conn !== NULL && !feof($this->conn) && ($numChanged = stream_select($this->fdrPool, $fdw, $fde, $this->readTimeout)) !== FALSE) {
-
         /* Unfortunately, we need to do a safety check for dead twitter streams - This seems to be able to happen where
          * you end up with a valid connection, but NO tweets coming along the wire (or keep alives). The below guards
          * against this.
@@ -400,7 +399,11 @@ abstract class Phirehose
         if ($statusLength > 0) {
           // Read status bytes and enqueue
           $bytesLeft = $statusLength - strlen($this->buff);
-          while ($bytesLeft > 0 && $this->conn !== NULL && !feof($this->conn) && ($numChanged = stream_select($this->fdrPool, $fdw, $fde, 0, 20000)) !== FALSE) {
+          while ( $bytesLeft > 0 
+                  && $this->conn !== NULL 
+                  && !feof($this->conn) 
+                  && ($numChanged = stream_select($this->fdrPool, $fdw, $fde, 0, 20000)) !== FALSE 
+                  && (time() - $lastStreamActivity) <= $this->idleReconnectTimeout) {  
             $this->fdrPool = array($this->conn); // Reassign
             $this->buff .= fread($this->conn, $bytesLeft); // Read until all bytes are read into buffer
             $bytesLeft = ($statusLength - strlen($this->buff));
@@ -437,23 +440,27 @@ abstract class Phirehose
         }
         // Check if filter is ready + allowed to be updated (reconnect)
         if ($this->filterChanged == TRUE && (time() - $lastFilterUpd) >= $this->filterUpdMin) {
-          $this->log('Reconnecting due to changed filter predicates.', 'info');
+          $this->log('Reconnecting due to changed filter predicates.','info');
           $this->reconnect();
           $lastFilterUpd = time();
         }
-
+        
       } // End while-stream-activity
+
+      if (function_exists('pcntl_signal_dispatch')) {
+        pcntl_signal_dispatch();
+      }
 
       // Some sort of socket error has occured
       $this->lastErrorNo = is_resource($this->conn) ? @socket_last_error($this->conn) : NULL;
       $this->lastErrorMsg = ($this->lastErrorNo > 0) ? @socket_strerror($this->lastErrorNo) : 'Socket disconnected';
-      $this->log('Phirehose connection error occured: ' . $this->lastErrorMsg, 'error');
-            
+      $this->log('Phirehose connection error occured: ' . $this->lastErrorMsg,'error');
+
       // Reconnect
     } while ($this->reconnect);
 
     // Exit
-    // $this->log('Exiting.');
+    $this->log('Exiting.');
     
   }
 
@@ -464,12 +471,10 @@ abstract class Phirehose
    */
   protected function statusUpdate()
   {
-/*
       $this->log('Consume rate: ' . $this->statusRate . ' status/sec (' . $this->statusCount . ' total), avg ' . 
         'enqueueStatus(): ' . $this->enqueueTimeMS . 'ms, avg checkFilterPredicates(): ' . $this->filterCheckTimeMS . 'ms (' . 
         $this->filterCheckCount . ' total) over ' . $this->avgElapsed . ' seconds, max stream idle period: ' . 
           $this->maxIdlePeriod . ' seconds.');
-*/
       // Reset
         $this->statusCount = $this->filterCheckCount = $this->enqueueSpent = 0;
         $this->filterCheckSpent = $this->idlePeriod = $this->maxIdlePeriod = 0;
@@ -541,12 +546,8 @@ abstract class Phirehose
       }
   
       // Debugging is useful
-/*
-      $this->log('Connecting to twitter stream: ' . $url
-      . ' with params: ' . str_replace("\n", '',
-        var_export($requestParams, TRUE))
-      );
-*/
+      $this->log('Connecting to twitter stream: ' . $url . ' with params: ' . str_replace("\n", '',
+        var_export($requestParams, TRUE)));
       
       /**
        * Open socket connection to make POST request. It'd be nice to use stream_context_create with the native
@@ -566,9 +567,9 @@ abstract class Phirehose
       }
       
       // Choose one randomly (if more than one)
-      // $this->log('Resolved host ' . $urlParts['host'] . ' to ' . implode(', ', $streamIPs));
+      $this->log('Resolved host ' . $urlParts['host'] . ' to ' . implode(', ', $streamIPs));
       $streamIP = $streamIPs[rand(0, (count($streamIPs) - 1))];
-      // $this->log("Connecting to {$scheme}{$streamIP}, port={$port}, connectTimeout={$this->connectTimeout}");
+      $this->log("Connecting to {$scheme}{$streamIP}, port={$port}, connectTimeout={$this->connectTimeout}");
       
       @$this->conn = fsockopen($scheme . $streamIP, $port, $errNo, $errStr, $this->connectTimeout);
   
@@ -579,7 +580,7 @@ abstract class Phirehose
         $connectFailures++;
         if ($connectFailures > $this->connectFailuresMax) {
           $msg = 'TCP failure limit exceeded with ' . $connectFailures . ' failures. Last error: ' . $errStr;
-          $this->log($msg, 'error');
+          $this->log($msg,'error');
           throw new PhirehoseConnectLimitExceeded($msg, $errNo); // Throw an exception for other code to handle
         }
         // Increase retry/backoff up to max
@@ -591,7 +592,7 @@ abstract class Phirehose
       }
       
       // TCP connect OK, clear last error (if present)
-      // $this->log('Connection established to ' . $streamIP);
+      $this->log('Connection established to ' . $streamIP);
       $this->lastErrorMsg = NULL;
       $this->lastErrorNo = NULL;
       
@@ -617,17 +618,16 @@ abstract class Phirehose
       fwrite($this->conn, $postData . "\r\n");
       fwrite($this->conn, "\r\n");
       
-/*
       $this->log("POST " . $urlParts['path'] . " HTTP/1.0\r\n");
       $this->log("Host: " . $urlParts['host'] . ':' . $port . "\r\n");
       $this->log("Content-type: application/x-www-form-urlencoded\r\n");
       $this->log("Content-length: " . strlen($postData) . "\r\n");
+      $this->log("Accept: */*\r\n");
       $this->log('Authorization: ' . $authCredentials . "\r\n");
       $this->log('User-Agent: ' . $this->userAgent . "\r\n");
       $this->log("\r\n");
       $this->log($postData . "\r\n");
       $this->log("\r\n");
-*/
       
       // First line is response
       list($httpVer, $httpCode, $httpMessage) = preg_split('/\s+/', trim(fgets($this->conn, 1024)), 3);
@@ -659,13 +659,13 @@ abstract class Phirehose
         // Have we exceeded maximum failures?
         if ($connectFailures > $this->connectFailuresMax) {
           $msg = 'Connection failure limit exceeded with ' . $connectFailures . ' failures. Last error: ' . $errStr;
-          $this->log($msg, 'error');
+          $this->log($msg,'error');
           throw new PhirehoseConnectLimitExceeded($msg, $httpCode); // We eventually throw an exception for other code to handle          
         }
         // Increase retry/backoff up to max
         $httpRetry = ($httpRetry < $this->httpBackoffMax) ? $httpRetry * 2 : $this->httpBackoffMax;
         $this->log('HTTP failure ' . $connectFailures . ' of ' . $this->connectFailuresMax . ' connecting to stream: ' . 
-          $errStr . '. Sleeping for ' . $httpRetry . ' seconds.', 'info');
+          $errStr . '. Sleeping for ' . $httpRetry . ' seconds.','info');
         sleep($httpRetry);
         continue;
         
@@ -731,8 +731,9 @@ abstract class Phirehose
    *     'error' is for exceptional conditions that may need human intervention. (For instance, emailing
    *          them to a system administrator may make sense.)
    */
-  protected function log($message, $level = 'info') {
-    @error_log('Phirehose: ' . $message, 3, OPENFUEGO_CACHE_DIR . '/phirehose-error-log');
+  protected function log($message,$level='notice')
+  {
+    @error_log('Phirehose: ' . $message, 0);
   }
 
   /**
@@ -741,7 +742,7 @@ abstract class Phirehose
   protected function disconnect()
   {
     if (is_resource($this->conn)) {
-      // $this->log('Closing Phirehose connection.');
+      $this->log('Closing Phirehose connection.');
       fclose($this->conn);
     }
     $this->conn = NULL;
@@ -752,7 +753,8 @@ abstract class Phirehose
    * Reconnects as quickly as possible. Should be called whenever a reconnect is required rather that connect/disconnect
    * to preserve streams reconnect state
    */
-  private function reconnect() {
+  private function reconnect()
+  {
     $reconnect = $this->reconnect;
     $this->disconnect(); // Implicitly sets reconnect to FALSE
     $this->reconnect = $reconnect; // Restore state to prev
@@ -773,18 +775,6 @@ abstract class Phirehose
    * @return NULL
    */
   public function heartbeat() {}
-
-/*
-  public function shouldStop()
-	{
-		global $_openfuego_should_stop;
-		if (isset($_openfuego_should_stop) && $_openfuego_should_stop) {
-			return TRUE;
-		}
-
-		return FALSE;
-	}
-*/
 
 } // End of class
 
