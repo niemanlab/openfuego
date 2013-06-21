@@ -85,6 +85,9 @@ if (OPENFUEGO_DEBUG == TRUE)
 else
 	ini_set('display_errors', 0);
 
+if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 50300)
+	die('OpenFuego requires PHP 5.3.0 or higher.');
+
 define('OPENFUEGO_DIR', dirname(__FILE__));
 
 require_once(OPENFUEGO_DIR . '/openfuego-settings.php');
