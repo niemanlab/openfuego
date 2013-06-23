@@ -365,7 +365,9 @@ function openfuego_populate_universe($authorities, $min_influence = 1) {
 
 	$twitter = openfuego_twitter_connect();
 	
-	$authorities = $twitter->get('users/lookup', array('screen_name' => implode(',', $authorities)));
+	$authorities = implode(',', $authorities);
+	$authorities = str_replace('@', '', $authorities);
+	$authorities = $twitter->get('users/lookup', array('screen_name' => $authorities));
 
 	foreach ($authorities as $authority) {
 		$authorities_ids[] = $authority['id_str'];
