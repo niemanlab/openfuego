@@ -51,7 +51,9 @@ function openfuego_get_metadata($input_urls, $params = NULL, $format = 'json') {
 		$params = implode('&', $params);
 	}
 	
-	$query = OPENFUEGO_EMBEDLY_API_ROOT . '/' . OPENFUEGO_EMBEDLY_API_ENDPOINT . '?key=' . OPENFUEGO_EMBEDLY_API_KEY . '&urls=' . $urls . '&format=' . $format . '&' . $params;
+	$endpoint = defined('OPENFUEGO_EMBEDLY_API_ENDPOINT') ? OPENFUEGO_EMBEDLY_API_ENDPOINT : 'oembed';
+
+	$query = OPENFUEGO_EMBEDLY_API_ROOT . '/' . $endpoint . '?key=' . OPENFUEGO_EMBEDLY_API_KEY . '&urls=' . $urls . '&format=' . $format . '&' . $params;
 
 	$metadata = openfuego_metadata_curl($query);
 
