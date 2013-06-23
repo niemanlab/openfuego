@@ -6,23 +6,29 @@
 **/
 
 // This file should be included by openfuego-config.php
-if (!defined('OPENFUEGO_DIR'))
+if (!defined('OPENFUEGO_DIR')) {
 	die('Where is openfuego-config.php?');
-else
-	define('OPENFUEGO', TRUE);
+}
 
-define('OPENFUEGO_DB_DRIVER',		'mysql');
+else {
+	define('OPENFUEGO', TRUE);
+}
+
+if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 50300)
+	die('OpenFuego requires PHP 5.3.0 or higher.');
+
+define('OPENFUEGO_DB_DRIVER', 'mysql');
 
 define('OPENFUEGO_USER_AGENT', 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)');
 define('OPENFUEGO_REFERER', 'http://google.com');
 
-define('OPENFUEGO_RESOURCES_DIR',	OPENFUEGO_DIR . '/resources');
+define('OPENFUEGO_RESOURCES_DIR', OPENFUEGO_DIR . '/resources');
 
-define('OPENFUEGO_TWITTER_DIR',		OPENFUEGO_RESOURCES_DIR . '/twitter');
-define('OPENFUEGO_SHORTENERS_DIR',	OPENFUEGO_RESOURCES_DIR . '/shorteners');
-define('OPENFUEGO_PHIREHOSE_DIR',	OPENFUEGO_RESOURCES_DIR . '/phirehose');
+define('OPENFUEGO_TWITTER_DIR',	OPENFUEGO_RESOURCES_DIR . '/twitter');
+define('OPENFUEGO_SHORTENERS_DIR', OPENFUEGO_RESOURCES_DIR . '/shorteners');
+define('OPENFUEGO_PHIREHOSE_DIR', OPENFUEGO_RESOURCES_DIR . '/phirehose');
 
-define('OPENFUEGO_PHP_DIR',			PHP_BINDIR); // supported by all environments?
+define('OPENFUEGO_PHP_DIR',	PHP_BINDIR); // supported by all environments?
 
 define('OPENFUEGO_CACHE_DIR', OPENFUEGO_DIR . '/cache');
 if (!is_dir(OPENFUEGO_CACHE_DIR)) {
@@ -66,4 +72,10 @@ if (file_exists(OPENFUEGO_DIR . '/openfuego-overrides.php')) {
 }
 
 require_once(OPENFUEGO_DIR . '/openfuego-functions.php');
-?>
+
+$twitter_handle = openfuego_twitter_connect();
+$twitter_handle->get("account/verify_credentials", array("include_entities" => 0, "skip_status" => 1));
+if ($twitter_handle->http_code !== 200) {
+	die("Cannot continue. Your Twitter credentials appear to be invalid.\n\n");
+}
+unset($twitter_handle);

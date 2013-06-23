@@ -62,8 +62,9 @@ function openfuego_array_most_common($input) {
 
 function openfuego_notify($subject, $body = NULL) {
 	
-	if (OPENFUEGO_DEBUG)
+	if (OPENFUEGO_DEBUG) {
 		echo $subject . "\n" . $body;
+	}
 	
 	if (mail(OPENFUEGO_WEBMASTER, $subject, print_r($body, TRUE), 'From: ' . OPENFUEGO_POSTMASTER)) {
 		return TRUE;
