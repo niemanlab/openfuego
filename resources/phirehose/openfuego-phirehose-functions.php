@@ -6,7 +6,7 @@ require_once(OPENFUEGO_PHIREHOSE_DIR . '/lib/OauthPhirehose.php');
 define('TWITTER_CONSUMER_KEY', OPENFUEGO_TW_CONSUMER_KEY);
 define('TWITTER_CONSUMER_SECRET', OPENFUEGO_TW_CONSUMER_SECRET);
 define('OAUTH_TOKEN', OPENFUEGO_TW_ACCESS_TOKEN);
-define('OAUTH_SECRET',  OPENFUEGO_TW_ACCESS_TOKEN_SECRET);
+define('OAUTH_SECRET', OPENFUEGO_TW_ACCESS_TOKEN_SECRET);
 
 class OpenFuegoQueueCollector extends OauthPhirehose {
 	/**
@@ -38,7 +38,7 @@ class OpenFuegoQueueCollector extends OauthPhirehose {
 		// Set subclass parameters
 		$this->queueDir = $queueDir;
 		$this->rotateInterval = $rotateInterval;
-		  
+		
 		// Call parent constructor
 		return parent::__construct($token, $secret, Phirehose::METHOD_FILTER);
 	}
@@ -59,7 +59,7 @@ class OpenFuegoQueueCollector extends OauthPhirehose {
 		if (($now - $this->lastRotated) > $this->rotateInterval) {
 			// Mark last rotation time as now
 			$this->lastRotated = $now;
-		  
+		
 			// Rotate it
 			$this->rotateStreamFile();
 		}	
@@ -133,166 +133,162 @@ class OpenFuegoQueueCollector extends OauthPhirehose {
 
 
 class OpenFuegoQueueConsumer {
-  
-  /**
-   * Member attribs
-   */
-  protected $queueDir;
-  protected $filePattern;
-  protected $checkInterval;
-  
-  /**
-   * Construct the consumer and start processing
-   */
-  public function __construct($queueDir = OPENFUEGO_CACHE_DIR, $filePattern = 'OpenFuegoQueue*.queue', $checkInterval = 10) {
-	$this->queueDir = $queueDir;
-	$this->filePattern = $filePattern;
-	$this->checkInterval = $checkInterval;
 	
-	// Sanity checks
-	if (!is_dir($queueDir)) {
-	  throw new ErrorException('Invalid directory: ' . $queueDir);
+	/**
+	 * Member attribs
+	 */
+	protected $queueDir;
+	protected $filePattern;
+	protected $checkInterval;
+	
+	/**
+	 * Construct the consumer and start processing
+	 */
+	public function __construct($queueDir = OPENFUEGO_CACHE_DIR, $filePattern = 'OpenFuegoQueue*.queue', $checkInterval = 10) {
+		$this->queueDir = $queueDir;
+		$this->filePattern = $filePattern;
+		$this->checkInterval = $checkInterval;
+		
+		// Sanity checks
+		if (!is_dir($queueDir)) {
+			throw new ErrorException('Invalid directory: ' . $queueDir);
+		}
 	}
 	
-  }
-  
-  /**
-   * Method that actually starts the processing task (never returns)
-   */
-  public function process() {
+	/**
+	 * Method that actually starts the processing task (never returns)
+	 */
+	public function process() {
 	
-	// Init some things
-	$lastCheck = 0;
+		// Init some things
+		$lastCheck = 0;
+		
+		// Loop infinitely
+		while (TRUE) {
+			
+			// Keep the DB tidy. Remove entries older than OPENFUEGO_EXPIRATION_INT days.
+			openfuego_clean_up();
 	
-	// Loop infinitely
-	while (TRUE) {
-	  
-	  // Keep the DB tidy. Remove entries older than OPENFUEGO_EXPIRATION_INT days.
-	  openfuego_clean_up();
+			// Get a list of queue files
+			$queueFiles = glob($this->queueDir . '/' . $this->filePattern);
+			$lastCheck = time();
+			
+			// $this->log('Found ' . count($queueFiles) . ' queue files to process...');
+			
+			// Iterate over each file (if any)
+			foreach ($queueFiles as $queueFile) {
+				$this->processQueueFile($queueFile);		
+	/*
+				pcntl_signal_dispatch();
+				if ($this->shouldStop()) exit;
+	*/
+				set_time_limit(60);
+			}
+	
+			// Wait until ready for next check
+			// $this->log('Sleeping...');
+			while (time() - $lastCheck < $this->checkInterval) {
+				sleep(1);
+			}
 
-	  // Get a list of queue files
-	  $queueFiles = glob($this->queueDir . '/' . $this->filePattern);
-	  $lastCheck = time();
-	  
-	  // $this->log('Found ' . count($queueFiles) . ' queue files to process...');
-	  
-	  // Iterate over each file (if any)
-	  foreach ($queueFiles as $queueFile) {
-		$this->processQueueFile($queueFile);
-  	    
-/*
-  	    pcntl_signal_dispatch();
-  	    if ($this->shouldStop()) exit;
-*/
-	  }
-
-	  // Wait until ready for next check
-	  // $this->log('Sleeping...');
-	  while (time() - $lastCheck < $this->checkInterval) {
-		sleep(1);
-	  }
-	 
-	} // Infinite loop
+		} // Infinite loop
 	
-  } // End process()
-  
-  /**
-   * Processes a queue file and does something with it (example only)
-   * @param string $queueFile The queue file
-   */
-  protected function processQueueFile($queueFile) {
-	// $this->log('Processing file: ' . $queueFile);
+	} // End process()
 	
-	// Open file
-	$fp = fopen($queueFile, 'r');
+	/**
+	 * Processes a queue file and does something with it (example only)
+	 * @param string $queueFile The queue file
+	 */
+	protected function processQueueFile($queueFile) {
+		// $this->log('Processing file: ' . $queueFile);
+		
+		// Open file
+		$fp = fopen($queueFile, 'r');
+		
+		// Check if something has gone wrong, or perhaps the file is just locked by another process
+		if (!is_resource($fp)) {
+			$this->log('WARN: Unable to open file or file already open: ' . $queueFile . ' - Skipping.');
+			return FALSE;
+		}
+		
+		// Lock file
+		flock($fp, LOCK_EX);
+		
+		// Loop over each line (1 line per status)
+		$statusCounter = 0;
+		while ($rawStatus = fgets($fp, 8192)) {
 	
-	// Check if something has gone wrong, or perhaps the file is just locked by another process
-	if (!is_resource($fp)) {
-	  $this->log('WARN: Unable to open file or file already open: ' . $queueFile . ' - Skipping.');
-	  return FALSE;
+			$statusCounter ++;
+			
+			$status = json_decode($rawStatus, TRUE);	// convert JSON data into PHP array
+			
+			// if data is invalid (e.g., if a user has deleted a tweet; surprisingly frequent)
+			if (is_array($status) == FALSE || isset($status['user']['id_str']) == FALSE) {
+	 			// $this->log('Status ' . $status['id_str'] . ' is invalid, continuing.');
+				continue; // skip it
+			}
+	/*
+			if ((strtotime($status['created_at']) - time()) > (OPENFUEGO_EXPIRATION_INT * 60 * 60)) { // Can't remember why this is here, but it makes no sense
+				continue; // skip it
+			}
+	*/			
+			if (array_key_exists(0, $status['entities']['urls']) == FALSE) { // if tweet does not contain link
+				continue;	// skip it
+			}
+		
+			/* Weed out statuses created by undesired user. (The streaming API also returns _retweets of_
+			** statuses by desired user, which we don't want.) */
+			if (!openfuego_is_citizen($status['user']['id_str'])) {	// if the tweeter is not a citizen w/ influence > x
+				continue; // skip it
+			}			
+	/*
+			if (array_key_exists('retweeted_status', $status)) {
+				$entities = $status['retweeted_status']['entities'];
+			} else {
+				$entities = $status['entities'];
+			}
+	*/
+	
+	/*
+			if (array_key_exists('retweeted_status', $status)) {
+				$status = $status['retweeted_status'];
+			}
+	*/
+			openfuego_process_urls($status);
+			
+			// $this->log('Decoded tweet: ' . $status['user']['screen_name'] . ': ' . urldecode($status['text']));
+	
+			set_time_limit(60);
+		
+			unset($status, $entities);
+		} // End while
+		
+		// Release lock and close
+		flock($fp, LOCK_UN);
+		fclose($fp);
+		
+		// All done with this file
+		// $this->log('Successfully processed ' . $statusCounter . ' tweets from ' . $queueFile . ' - deleting.');
+		unset($rawStatus);
+		unlink($queueFile);
+		
+		pcntl_signal_dispatch();
+		if ($this->shouldStop()) {
+			exit;
+		}
 	}
 	
-	// Lock file
-	flock($fp, LOCK_EX);
-	
-	// Loop over each line (1 line per status)
-	$statusCounter = 0;
-	while ($rawStatus = fgets($fp, 8192)) {
-
-		$statusCounter ++;
-		
-		$status = json_decode($rawStatus, TRUE);	// convert JSON data into PHP array
-		
-		// if data is invalid (e.g., if a user has deleted a tweet; surprisingly frequent)
-		if (is_array($status) == FALSE || isset($status['user']['id_str']) == FALSE) {
- 			// $this->log('Status ' . $status['id_str'] . ' is invalid, continuing.');
-			continue; // skip it
-		}
-
-/*
-		if ((strtotime($status['created_at']) - time()) > (OPENFUEGO_EXPIRATION_INT * 60 * 60)) { // Can't remember why this is here, but it makes no sense
-			continue; // skip it
-		}
-*/
-		  	
-		if (array_key_exists(0, $status['entities']['urls']) == FALSE) { // if tweet does not contain link
-			continue;	// skip it
-		}
-	
-		/* Weed out statuses created by undesired user. (The streaming API also returns _retweets of_
-		** statuses by desired user, which we don't want.) */
-		if (!openfuego_is_citizen($status['user']['id_str'])) {	// if the tweeter is not a citizen w/ influence > x
-			continue; // skip it
-		}
-				
-/*
-		if (array_key_exists('retweeted_status', $status)) {
-			$entities = $status['retweeted_status']['entities'];
-		} else {
-			$entities = $status['entities'];
-		}
-*/
-
-/*
-		if (array_key_exists('retweeted_status', $status)) {
-			$status = $status['retweeted_status'];
-		}
-*/
-		
-		openfuego_process_urls($status);
-		
-	  	// $this->log('Decoded tweet: ' . $status['user']['screen_name'] . ': ' . urldecode($status['text']));
-	  
-	  	unset($status, $entities);
-	} // End while
-	
-	// Release lock and close
-	flock($fp, LOCK_UN);
-	fclose($fp);
-	
-	// All done with this file
-	// $this->log('Successfully processed ' . $statusCounter . ' tweets from ' . $queueFile . ' - deleting.');
-	unset($rawStatus);
-	unlink($queueFile);
-	
-	pcntl_signal_dispatch();
-	if ($this->shouldStop())
-		exit;
-
-  }
-  
-  /**
-   * Basic log function.
-   *
-   * @see error_log()
-   * @param string $messages
-   *
-   *
-   */
-  protected function log($message,$level='notice')
-  {
-    // @error_log('Phirehose: ' . $message, 0);
-  }
+	/**
+	 * Basic log function.
+	 *
+	 * @see error_log()
+	 * @param string $messages
+	 *
+	 *
+	 */
+	protected function log($message, $level = 'notice') {
+		// @error_log('Phirehose: ' . $message, 0);
+	}
 	
 	// NEED LOG ROTATION SCRIPT
 
@@ -305,5 +301,3 @@ class OpenFuegoQueueConsumer {
 		return FALSE;
 	}
 }
-
-?>

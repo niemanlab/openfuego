@@ -27,10 +27,6 @@ if (!function_exists('pcntl_fork')) {
 	die($error_message);
 }
 
-ini_set('max_execution_time', 0);
-ini_set('max_input_time', 0);
-set_time_limit(0);
-
 pcntl_signal(SIGHUP, SIG_IGN);
 
 $pids = array();
