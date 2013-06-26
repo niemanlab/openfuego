@@ -272,9 +272,11 @@ class OpenFuegoQueueConsumer {
 		unset($rawStatus);
 		unlink($queueFile);
 		
-		pcntl_signal_dispatch();
-		if ($this->shouldStop()) {
-			exit;
+		if (function_exists('pcntl_signal_dispatch')) {
+			pcntl_signal_dispatch();
+			if ($this->shouldStop()) {
+				exit;
+			}
 		}
 	}
 	
