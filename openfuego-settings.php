@@ -72,10 +72,3 @@ if (file_exists(OPENFUEGO_DIR . '/openfuego-overrides.php')) {
 }
 
 require_once(OPENFUEGO_DIR . '/openfuego-functions.php');
-
-$twitter_handle = openfuego_twitter_connect();
-$twitter_handle->get("account/verify_credentials", array("include_entities" => 0, "skip_status" => 1));
-if ($twitter_handle->http_code !== 200) {
-	die("Cannot continue. Your Twitter credentials appear to be invalid.\n\n");
-}
-unset($twitter_handle);
