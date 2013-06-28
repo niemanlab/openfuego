@@ -28,7 +28,7 @@ define('OPENFUEGO_DB_PORT', 3306); // if you don't know, 3306
 
 /** Time to curate.
   * Specify the usernames of authorities at the center of OpenFuego's universe.
-  * Typically 5–15 people, but no minimum or maximum. No @ symbols.
+  * Maximum 15. No @ symbols.
 **/
 $openfuego_authorities = array(
 	'authority1',
