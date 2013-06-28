@@ -377,7 +377,10 @@ function openfuego_populate_universe($authorities, $min_influence = 1) {
 	
 	foreach ($authorities as $authority) {
 		$authority_friends_ids = $twitter->get('friends/ids', array('screen_name' => $authority['screen_name']));
-			if ($twitter->http_code != 200) die('Dying, ' . $twitter->http_code);
+			if ($twitter->http_code != 200) {
+				openfuego_notify(__FUNCTION__ . ' cannot continue. Twitter error ' . $twitter->http_code . '.');
+				die();
+			}
 		$authority_friends_ids = $authority_friends_ids['ids'];
 		$universe_ids = array_merge($universe_ids, $authority_friends_ids); // append more ids to universe
 	}
