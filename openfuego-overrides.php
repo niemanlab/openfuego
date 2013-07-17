@@ -1,1 +1,0 @@
-<? // Override default OpenFuego settings here, if desired

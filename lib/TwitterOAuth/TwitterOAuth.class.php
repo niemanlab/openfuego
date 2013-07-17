@@ -6,12 +6,12 @@
  * The first PHP Library to support OAuth for Twitter's REST API.
  */
 
-/* Load OAuth lib. You can find it at http://oauth.net */
-require_once(dirname(__FILE__) . '/OAuth.php');
-
 /**
  * Twitter OAuth class
  */
+ 
+require_once('OAuth.class.php');
+ 
 class TwitterOAuth {
   /* Contains the last HTTP status code returned. */
   public $http_code;
@@ -25,18 +25,16 @@ class TwitterOAuth {
   public $connecttimeout = 30; 
   /* Verify SSL Cert. */
   public $ssl_verifypeer = FALSE;
-  /* Response format. */
+  /* Respons format. */
   public $format = 'json';
   /* Decode returned json data. */
   public $decode_json = TRUE;
   /* Contains the last HTTP headers returned. */
   public $http_info;
-  /* Set the useragent. */
-  public $useragent = 'TwitterOAuth v0.2.0-beta3';
+  /* Set the useragnet. */
+  public $useragent = 'TwitterOAuth v0.2.0-beta2';
   /* Immediately retry the API call if the response was not successful. */
-  public $retry = TRUE;
-  /* Return JSON as array instead of object */
-  public $json_array = TRUE;
+  //public $retry = TRUE;
 
 
 
@@ -74,11 +72,9 @@ class TwitterOAuth {
    *
    * @returns a key/value array containing oauth_token and oauth_token_secret
    */
-  function getRequestToken($oauth_callback = NULL) {
+  function getRequestToken($oauth_callback) {
     $parameters = array();
-    if (!empty($oauth_callback)) {
-      $parameters['oauth_callback'] = $oauth_callback;
-    } 
+    $parameters['oauth_callback'] = $oauth_callback; 
     $request = $this->oAuthRequest($this->requestTokenURL(), 'GET', $parameters);
     $token = OAuthUtil::parse_parameters($request);
     $this->token = new OAuthConsumer($token['oauth_token'], $token['oauth_token_secret']);
@@ -110,11 +106,9 @@ class TwitterOAuth {
    *                "user_id" => "9436992",
    *                "screen_name" => "abraham")
    */
-  function getAccessToken($oauth_verifier = FALSE) {
+  function getAccessToken($oauth_verifier) {
     $parameters = array();
-    if (!empty($oauth_verifier)) {
-      $parameters['oauth_verifier'] = $oauth_verifier;
-    }
+    $parameters['oauth_verifier'] = $oauth_verifier;
     $request = $this->oAuthRequest($this->accessTokenURL(), 'GET', $parameters);
     $token = OAuthUtil::parse_parameters($request);
     $this->token = new OAuthConsumer($token['oauth_token'], $token['oauth_token_secret']);
@@ -147,7 +141,7 @@ class TwitterOAuth {
   function get($url, $parameters = array()) {
     $response = $this->oAuthRequest($url, 'GET', $parameters);
     if ($this->format === 'json' && $this->decode_json) {
-      return json_decode($response, TRUE);
+      return json_decode($response);
     }
     return $response;
   }
@@ -158,7 +152,7 @@ class TwitterOAuth {
   function post($url, $parameters = array()) {
     $response = $this->oAuthRequest($url, 'POST', $parameters);
     if ($this->format === 'json' && $this->decode_json) {
-      return json_decode($response, TRUE);
+      return json_decode($response);
     }
     return $response;
   }
@@ -169,7 +163,7 @@ class TwitterOAuth {
   function delete($url, $parameters = array()) {
     $response = $this->oAuthRequest($url, 'DELETE', $parameters);
     if ($this->format === 'json' && $this->decode_json) {
-      return json_decode($response, TRUE);
+      return json_decode($response);
     }
     return $response;
   }

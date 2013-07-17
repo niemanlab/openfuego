@@ -1,20 +1,39 @@
-<?php
-// Sanity check
-if (false) { ?>
-	OpenFuego requires PHP 5.3.0 or higher.
-<?php }
+<?php namespace OpenFuego;
+
+/** This script processes the data placed
+  * in the queue by collect.php.
+**/
+
+if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 50300) {
+	die(__NAMESPACE__ . ' requires PHP 5.3.0 or higher.');
+}
+
+if (php_sapi_name() != 'cli') {
+	die('This script must be invoked from the command line.');
+}
+
+if (defined(__NAMESPACE__ . '\VERBOSE') == FALSE) {
+	if (in_array('-v', $argv)) {
+		define(__NAMESPACE__ . '\VERBOSE', TRUE);
+	}
+	
+	else {
+		define(__NAMESPACE__ . '\VERBOSE', FALSE);
+	}	
+}
+
+require_once(__DIR__ . '/init.php');
 
 if (!defined('OPENFUEGO') && function_exists('pcntl_fork')) {
 	$error_message = "\n"
-		. 'Do not run this script directly. Run openfuego-fetch.php to start.'
+		. 'Do not run this script directly. Run fetch.php to start.'
 		. "\n\n";
 	die($error_message);
 }
 
-require_once(dirname(__FILE__) . '/openfuego-config.php');
-require_once(OPENFUEGO_PHIREHOSE_DIR . '/openfuego-phirehose-functions.php');
+require_once(__DIR__ . '/init.php');
 
-$dbh = openfuego_get_dbh();
+$dbh = new \OpenFuego\lib\DbHandle;
 
 $sql = "
 CREATE TABLE IF NOT EXISTS `openfuego_citizens` (
@@ -64,11 +83,13 @@ try {
 	$sth = $dbh->prepare($sql);
 	$sth->execute();
 
-} catch (PDOException $e) {
+} catch (\PDOException $e) {
 	die($e);
 }
 
-$fqc = new OpenFuegoQueueConsumer();
-$fqc->process();
+$dbh = NULL;
+
+$consumer = new \OpenFuego\app\Consumer\Consumer;
+$consumer->process();
 
 exit;
