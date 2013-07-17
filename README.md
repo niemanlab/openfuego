@@ -16,7 +16,7 @@ Fuego and OpenFuego were created by [Andrew Phelps](https://twitter.com/andrewph
 
 ### Requirements and notes
 
-OpenFuego is a backend application that runs at the command line. There is nothing to look at! It’s up to you to build a cool webpage or app that does something with the data. To see an example, visit [Fuego](http://www.niemanlab.org/fuego]).
+OpenFuego is a backend application that runs at the command line. There is nothing to look at! It’s up to you to build a cool webpage or app that does something with the data. To see an example, visit [Fuego](http://www.niemanlab.org/fuego).
 
 OpenFuego is PHP. It requires PHP 5.3.0 or higher and the cURL library. You probably need root access. It probably doesn’t work in Windows. OpenFuego is designed to run continuously in background processes, like a daemon. If you know much about programming, you know PHP is a really bad language for this type of program. PHP is what I knew when I first sat down to write the program, and by the time it was big and complex, it would have been too much work to learn a different language and start from scratch.
 
