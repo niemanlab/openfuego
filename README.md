@@ -2,7 +2,7 @@
 
 OpenFuego is the open-source version of [Fuego](http://www.niemanlab.org/fuego), a Twitter bot created to track the future-of-journalism crowd and the links they’re sharing.
 
-OpenFuego is essentially “Fuego in a box,” allowing you to monitor your own universe of people on Twitter — celebrities, authors, tech writers, film critics, or just people you like.
+OpenFuego is essentially “Fuego in a box,” allowing you to monitor your own universe of people on Twitter — celebrities, tech writers, film critics, Canadians, or just people you like.
 
 Fuego and OpenFuego were created by [Andrew Phelps](https://twitter.com/andrewphelps) for the [Nieman Journalism Lab](http://www.niemanlab.org/).
 
