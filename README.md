@@ -1,6 +1,6 @@
 # OpenFuego
 
-OpenFuego is the open-source version of [Fuego](http://www.niemanlab.org/fuego), a heat-seeking Twitter bot originally created to track the future-of-journalism crowd.
+OpenFuego is the open-source version of [Fuego](http://www.niemanlab.org/fuego), a Twitter bot created to track the future-of-journalism crowd and the links they’re sharing.
 
 OpenFuego is essentially “Fuego in a box,” allowing you to monitor your own universe of people on Twitter — celebrities, authors, tech writers, film critics, or just people you like.
 
@@ -34,4 +34,4 @@ See examples/getLinks.php for a dead-simple way to query OpenFuego for links.
 
 ### About Nieman Journalism Lab
 
-The [Nieman Journalism Lab](http://www.niemanlab.org/) [(@niemanlab)](https://twitter.com/niemanlab) is a collaborative attempt to figure out how quality journalism can survive and thrive in the Internet age. It’s a project of the [Nieman Foundation for Journalism](http://www.nieman.harvard.edu) at Harvard University.
+The [Nieman Journalism Lab](http://www.niemanlab.org/) ([@niemanlab](https://twitter.com/niemanlab)) is a collaborative attempt to figure out how quality journalism can survive and thrive in the Internet age. It’s a project of the [Nieman Foundation for Journalism](http://www.nieman.harvard.edu) at Harvard University.
