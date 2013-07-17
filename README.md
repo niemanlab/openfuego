@@ -24,13 +24,17 @@ OpenFuego is PHP. It requires PHP 5.3.0 or higher and the cURL library. You prob
 
 Follow the instructions in config.php. Create a MySQL database and enter the credentials in that file, along with Twitter credentials and optional (but recommended) API keys for Bitly, Goo.gl, and Embed.ly.
 
-Once config.php is edited, run fetch.php at the command line. You may or not get further instructions, depending on whether your version of PHP is compiled with process control.
-
 If you write any scripts that query OpenFuego, include init.php at the top of the file. The application resides in the OpenFuego [namespace](http://php.net/manual/en/language.namespaces.php).
 
 ### Usage
 
+Once config.php is edited, run `fetch.php` at the command line. You may or not get further instructions, depending on whether your version of PHP is compiled with process control.
+
+To run OpenFuego in verbose mode, which displays the program’s output on screen, run `fetch.php -v`.
+
 See examples/getLinks.php for a dead-simple way to query OpenFuego for links.
+
+---
 
 ### About Nieman Journalism Lab
 
