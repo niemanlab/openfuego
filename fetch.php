@@ -22,9 +22,9 @@ if (!function_exists('pcntl_fork')) {
 	$error_message = "\n"
 		. 'To start OpenFuego, run these commands:'
 		. "\n\n"
-		. "\tnohup " . \PHP_BINDIR . '/php ' . BASE_DIR . '/openfuego-collect.php > /dev/null 2> /dev/null & echo $!'
+		. "\tnohup " . \PHP_BINDIR . '/php ' . BASE_DIR . '/collect.php > /dev/null 2> /dev/null & echo $!'
 		. "\n"
-		. "\tnohup " . \PHP_BINDIR . '/php ' . BASE_DIR . '/openfuego-consume.php > /dev/null 2> /dev/null & echo $!'
+		. "\tnohup " . \PHP_BINDIR . '/php ' . BASE_DIR . '/consume.php > /dev/null 2> /dev/null & echo $!'
 		. "\n\n";
 
 	die($error_message);
