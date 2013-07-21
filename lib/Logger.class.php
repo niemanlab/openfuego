@@ -8,15 +8,21 @@ class Logger {
 	public static function debug($message) {
 		
 		if (self::$verbose) {
-			$timestamp = '[' . date('Y-m-d H:i:s') . ']: ';
-			echo $timestamp . $message . "\n";
+			echo self::getTimestamp() . $message . "\n";
 		}
 	}
 	
+	public static function info($message) {
+		if (self::$verbose) {
+			echo self::getTimestamp() . $message . "\n";
+		}
+		
+		// write to log
+	}
+
 	public static function error($message) {
 		if (self::$verbose) {
-			$timestamp = '[' . date('Y-m-d H:i:s') . ']: ';
-			echo $timestamp . $message . "\n";
+			echo self::getTimestamp() . $message . "\n";
 		}
 		
 		// write to log
@@ -24,7 +30,7 @@ class Logger {
 	
 	public static function fatal($message) {
 		if (self::$verbose) {
-			echo $timestamp . $message . "\n";
+			echo self::getTimestamp() . $message . "\n";
 		}
 
 		else {
@@ -36,5 +42,9 @@ class Logger {
 	
 	private static function notify($message) {
 		mail(\OpenFuego\WEBMASTER, 'OpenFuego encountered a fatal error', $message, 'From: ' . \OpenFuego\POSTMASTER);
-	}	
+	}
+	
+	private static function getTimestamp() {
+		return '[' . date('Y-m-d H:i:s') . ']: ';
+	}
 }
