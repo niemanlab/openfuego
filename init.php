@@ -40,7 +40,7 @@ spl_autoload_register(function($className) {
 
 /* Setting miscellaneous constants */
 define('BASE_DIR', __DIR__);
-define('TMP_DIR', BASE_DIR . '/tmp/');
+define('TMP_DIR', BASE_DIR . '/tmp');
 define('POSTMASTER', __NAMESPACE__ . '@' . __NAMESPACE__ . '.local'); // from address on error e-mails
 
 if (!is_dir(TMP_DIR)) {
