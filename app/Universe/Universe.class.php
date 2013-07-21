@@ -139,8 +139,6 @@ class Universe {
 	}
 	
 	public function __destruct() {
-		if (self::$dbh) {
-			unset(self::$dbh);
-		}
+
 	}
 }
