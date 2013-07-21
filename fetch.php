@@ -30,43 +30,31 @@ if (!function_exists('pcntl_fork')) {
 	die($error_message);
 }
 
+// Ignore hangup signal (when user exits shell)
 pcntl_signal(SIGHUP, SIG_IGN);
+
+// Handle shutdown tasks
+pcntl_signal(SIGTERM, function() {
+
+	global $_should_stop;
+	$_should_stop = TRUE;
+
+	\OpenFuego\lib\Logger::info("Received shutdown request, finishing up.");
+
+	return;
+});
 
 $pids = array();
 
 $pids[0] = pcntl_fork();
 
-if (!$pids[0]) {	
+if (!$pids[0]) {
 	include_once(__DIR__ . '/collect.php');
 }
 
 $pids[1] = pcntl_fork();
 
 if (!$pids[1]) {
-
-	function sig_handler($signo) {
-		switch ($signo) {
-			case SIGTERM:
-				// handle shutdown tasks
-				global $_should_stop;
-				$_should_stop = TRUE;
-				break;
-			case SIGINT:
-				// handle ^C
-				global $_should_stop;
-				$_should_stop = TRUE;
-				break;
-			default:
-				// handle all other signals
-				global $_should_stop;
-				$_should_stop = TRUE;
-				break;
-		}
-	}
-
-	pcntl_signal(SIGTERM, '\OpenFuego\sig_handler');
-	pcntl_signal(SIGINT, '\OpenFuego\sig_handler');
-
 	include_once(__DIR__ . '/consume.php');
 }
 

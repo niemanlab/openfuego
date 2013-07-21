@@ -15,6 +15,7 @@ class Collector extends \OauthPhirehose {
 	protected $streamFile;
 	protected $statusStream;
 	protected $lastRotated;
+	protected $_pcntlEnabled;
 
 	/**
 	* Overidden constructor to take class-specific parameters
@@ -30,6 +31,7 @@ class Collector extends \OauthPhirehose {
 		// Set subclass parameters
 		$this->queueDir = $queueDir;
 		$this->rotateInterval = $rotateInterval;
+		$this->_pcntlEnabled = function_exists('pcntl_signal_dispatch') ? TRUE : FALSE;
 		
 		// Call parent constructor
 		return parent::__construct($token, $secret, \Phirehose::METHOD_FILTER);
@@ -41,7 +43,7 @@ class Collector extends \OauthPhirehose {
 	* @param string $status
 	*/
 	public function enqueueStatus($status) {
-	
+		
 		// Write the status to the stream (must be via getStream())
 		fputs($this->getStream(), $status);
 		
@@ -54,7 +56,7 @@ class Collector extends \OauthPhirehose {
 		
 			// Rotate it
 			$this->rotateStreamFile();
-		}	
+		}		
 	}
 	
 	/**
@@ -63,6 +65,11 @@ class Collector extends \OauthPhirehose {
 	* @return resource
 	*/
 	private function getStream() {
+
+		// Check for SIGTERM to shut down gracefully
+		if ($this->_pcntlEnabled == TRUE) {
+			$this->handleSignals();
+		}
 
 		// If we have a valid stream, return it
 		if (is_resource($this->statusStream)) {
@@ -115,10 +122,20 @@ class Collector extends \OauthPhirehose {
 		// $this->log('Successfully rotated active stream to queue file: ' . $queueFile) . "\n";
 	}
 	
-	protected function log($message,$level='notice')
-	{
-		// @error_log('Phirehose: ' . $message, 0);
+	protected function log($message,$level='notice') {
+
 	}
 
-	
+
+	public function handleSignals() {
+
+		pcntl_signal_dispatch();
+		
+		global $_should_stop;
+
+		if (isset($_should_stop) && $_should_stop == TRUE) {
+			\OpenFuego\lib\Logger::debug(__CLASS__ . " terminated.\n");
+			exit();
+		}
+	}
 }

@@ -390,7 +390,8 @@ abstract class Phirehose
       $fdw = $fde = NULL; // Placeholder write/error file descriptors for stream_select
       
       // We use a blocking-select with timeout, to allow us to continue processing on idle streams
-      while ($this->conn !== NULL && !feof($this->conn) && ($numChanged = stream_select($this->fdrPool, $fdw, $fde, $this->readTimeout)) !== FALSE) {
+      // Suppressing errors from stream_select() to avoid signal interruption warnings on quit
+      while ($this->conn !== NULL && !feof($this->conn) && ($numChanged = @stream_select($this->fdrPool, $fdw, $fde, $this->readTimeout)) !== FALSE) {
         /* Unfortunately, we need to do a safety check for dead twitter streams - This seems to be able to happen where
          * you end up with a valid connection, but NO tweets coming along the wire (or keep alives). The below guards
          * against this.

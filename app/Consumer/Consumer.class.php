@@ -18,6 +18,7 @@ class Consumer {
 		$this->_queueDir = $queueDir;
 		$this->_filePattern = $filePattern;
 		$this->_checkInterval = $checkInterval;
+		$this->_pcntlEnabled = function_exists('pcntl_signal_dispatch') ? TRUE : FALSE;
 		
 		// Sanity checks
 		if (!is_dir($queueDir)) {
@@ -50,11 +51,9 @@ class Consumer {
 				$this->processQueueFile($queueFile);		
 			}
 
-			if (function_exists('pcntl_signal_dispatch')) {
-				pcntl_signal_dispatch();
-				if ($this->shouldStop()) {
-					exit("Terminated.\n");
-				}
+			// Check for SIGTERM to shut down gracefully
+			if ($this->_pcntlEnabled == TRUE) {
+				$this->handleSignals();
 			}
 	
 			// Wait until ready for next check
@@ -253,13 +252,16 @@ class Consumer {
 		return $this->_dbh;
 	}
 
-	
-	public function shouldStop() {
-		global $_should_stop;
-		if (isset($_should_stop) && $_should_stop) {
-			return TRUE;
-		}
+
+	public function handleSignals() {
+
+		pcntl_signal_dispatch();
 		
-		return FALSE;
-	}
+		global $_should_stop;
+
+		if (isset($_should_stop) && $_should_stop == TRUE) {
+			\OpenFuego\lib\Logger::debug(__CLASS__ . " terminated.\n");
+			exit();
+		}
+	}	
 }
