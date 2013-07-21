@@ -7,41 +7,53 @@ class Logger {
 	
 	public static function debug($message) {
 		
+		$messageFormatted = self::getTimestamp() . $message . "\n";
+
 		if (self::$verbose) {
-			echo self::getTimestamp() . $message . "\n";
+			echo $messageFormatted;
 		}
 	}
 	
 	public static function info($message) {
+
+		$messageFormatted = self::getTimestamp() . $message . "\n";
+
 		if (self::$verbose) {
-			echo self::getTimestamp() . $message . "\n";
+			echo $messageFormatted;
 		}
 		
 		// write to log
 	}
 
 	public static function error($message) {
+
+		$messageFormatted = self::getTimestamp() . $message . "\n";
+
 		if (self::$verbose) {
-			echo self::getTimestamp() . $message . "\n";
+			echo $messageFormatted;
 		}
 		
 		// write to log
 	}
 	
 	public static function fatal($message) {
+		
+		$messageFormatted = self::getTimestamp() . $message . "\n";
+		
 		if (self::$verbose) {
-			echo self::getTimestamp() . $message . "\n";
+			echo $messageFormatted;
 		}
 
 		else {
-			self::notify($message);	
+			$subject = "OpenFuego encountered a fatal error";
+			self::notify($subject, $messageFormatted);	
 		}
 
 		// write to log
 	}
 	
-	private static function notify($message) {
-		mail(\OpenFuego\WEBMASTER, 'OpenFuego encountered a fatal error', $message, 'From: ' . \OpenFuego\POSTMASTER);
+	private static function notify($subject, $message) {
+		mail(\OpenFuego\WEBMASTER, $subject, $message, 'From: ' . POSTMASTER);
 	}
 	
 	private static function getTimestamp() {
