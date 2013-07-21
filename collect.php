@@ -31,6 +31,10 @@ if (!defined('OPENFUEGO') && function_exists('pcntl_fork')) {
 
 require_once(__DIR__ . '/init.php');
 
+register_shutdown_function(function() {
+	\OpenFuego\lib\Logger::fatal(__NAMESPACE__ . " collector was terminated.");
+});
+
 $authorities = unserialize(AUTHORITIES);
 
 $universe = new app\Universe\Universe;

@@ -22,8 +22,6 @@ if (defined(__NAMESPACE__ . '\VERBOSE') == FALSE) {
 	}	
 }
 
-require_once(__DIR__ . '/init.php');
-
 if (!defined('OPENFUEGO') && function_exists('pcntl_fork')) {
 	$error_message = "\n"
 		. 'Do not run this script directly. Run fetch.php to start.'
@@ -32,6 +30,10 @@ if (!defined('OPENFUEGO') && function_exists('pcntl_fork')) {
 }
 
 require_once(__DIR__ . '/init.php');
+
+register_shutdown_function(function() {
+	\OpenFuego\lib\Logger::fatal(__NAMESPACE__ . " consumer was terminated.");
+});
 
 $dbh = new \OpenFuego\lib\DbHandle;
 

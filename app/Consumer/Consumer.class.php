@@ -260,7 +260,6 @@ class Consumer {
 		global $_should_stop;
 
 		if (isset($_should_stop) && $_should_stop == TRUE) {
-			\OpenFuego\lib\Logger::debug(__CLASS__ . " terminated.\n");
 			exit();
 		}
 	}	
