@@ -19,7 +19,7 @@ namespace OpenFuego;
   * Specify the authorities at the center of the universe.
   * Maximum 15. No @ symbol necessary.
  **/
-define('AUTHORITIES', serialize(
+define(__NAMESPACE__ . '\AUTHORITIES', serialize(
 	array(
 		'someHandle1',
 		'someHandle2',

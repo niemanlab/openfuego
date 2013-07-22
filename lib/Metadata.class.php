@@ -137,7 +137,7 @@ class Metadata {
 	
 			} else {
 	
-				$twitter = new TwitterHandle;
+				$twitter = new TwitterHandle();
 				$status = $twitter->get("statuses/show/$id_str", array('include_entities' => false));
 	
 				if (preg_match("/2../", $twitter->http_code)) {
@@ -205,7 +205,7 @@ class Metadata {
 		
 		$query = $short_url ? $short_url . ' OR ' . $long_url : $long_url;
 	
-		$twitter = new TwitterHandle;
+		$twitter = new TwitterHandle();
 		$search = $twitter->get("search/tweets", array('q' => $query, 'count' => 100, 'result_type' => 'mixed'));
 		
 		if ($search['statuses']) {
@@ -260,7 +260,7 @@ class Metadata {
 	
 	public function getDbh() {
 		if (!$this->_dbh) {
-			$this->_dbh = new DbHandle;
+			$this->_dbh = new DbHandle();
 		}
 		
 		return $this->_dbh;

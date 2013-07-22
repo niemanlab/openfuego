@@ -53,7 +53,7 @@ class Logger {
 	}
 	
 	private static function notify($subject, $message) {
-		mail(\OpenFuego\WEBMASTER, $subject, $message, 'From: ' . POSTMASTER);
+		mail(\OpenFuego\WEBMASTER, $subject, $message, 'From: ' . \OpenFuego\POSTMASTER);
 	}
 	
 	private static function getTimestamp() {

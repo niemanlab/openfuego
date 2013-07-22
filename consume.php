@@ -4,6 +4,10 @@
   * in the queue by collect.php.
 **/
 
+use OpenFuego\lib\DbHandle as DbHandle;
+use OpenFuego\app\Consumer as Consumer;
+use OpenFuego\lib\Logger as Logger;
+
 if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 50300) {
 	die(__NAMESPACE__ . ' requires PHP 5.3.0 or higher.');
 }
@@ -22,10 +26,10 @@ if (!defined('OPENFUEGO') && function_exists('pcntl_fork')) {
 require_once(__DIR__ . '/init.php');
 
 register_shutdown_function(function() {
-	\OpenFuego\lib\Logger::fatal(__NAMESPACE__ . " consumer was terminated.");
+	Logger::fatal(__NAMESPACE__ . " consumer was terminated.");
 });
 
-$dbh = new \OpenFuego\lib\DbHandle;
+$dbh = new DbHandle();
 
 $sql = "
 CREATE TABLE IF NOT EXISTS `openfuego_citizens` (
@@ -81,7 +85,7 @@ try {
 
 $dbh = NULL;
 
-$consumer = new \OpenFuego\app\Consumer;
+$consumer = new Consumer();
 $consumer->process();
 
 exit;

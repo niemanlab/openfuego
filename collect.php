@@ -4,6 +4,10 @@
   * and captures raw data into a queue for processing.
 **/
 
+use OpenFuego\app\Universe as Universe;
+use OpenFuego\app\Collector as Collector;
+use OpenFuego\lib\Logger as Logger;
+
 if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 50300) {
 	die(__NAMESPACE__ . ' requires PHP 5.3.0 or higher.');
 }
@@ -22,12 +26,12 @@ if (!defined('OPENFUEGO') && function_exists('pcntl_fork')) {
 require_once(__DIR__ . '/init.php');
 
 register_shutdown_function(function() {
-	\OpenFuego\lib\Logger::fatal(__NAMESPACE__ . " collector was terminated.");
+	Logger::fatal(__NAMESPACE__ . " collector was terminated.");
 });
 
-$authorities = unserialize(AUTHORITIES);
+$authorities = unserialize(\OpenFuego\AUTHORITIES);
 
-$universe = new app\Universe;
+$universe = new Universe();
 
 /** The next line is commented out by default.
   * Uncomment it to repopulate the universe on each fetch. */
@@ -44,7 +48,7 @@ if (!$citizens) {
 $citizens = array_slice($citizens, 0, TWITTER_PREDICATE_LIMIT);
 	
 // Start streaming/collecting
-$collector = new app\Collector(TWITTER_OAUTH_TOKEN, TWITTER_OAUTH_SECRET);
+$collector = new Collector(TWITTER_OAUTH_TOKEN, TWITTER_OAUTH_SECRET);
 
 $collector->setFollow($citizens);
 

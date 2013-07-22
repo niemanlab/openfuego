@@ -1,5 +1,8 @@
 <?php namespace OpenFuego\app;
 
+use OpenFuego\lib\TwitterHandle as TwitterHandle;
+use OpenFuego\lib\DbHandle as DbHandle;
+
 class Universe {
 
 	public $citizens;
@@ -39,7 +42,7 @@ class Universe {
 	
 		$owner_screen_name = \OpenFuego\TWITTER_SCREEN_NAME;
 	
-		$twitter = new \OpenFuego\lib\TwitterHandle;
+		$twitter = new TwitterHandle();
 		
 		$authorities = implode(',', $authorities);
 		$authorities = str_replace('@', '', $authorities);
@@ -132,7 +135,7 @@ class Universe {
 	
 	protected static function getDbh() {
 		if (!self::$dbh) {
-			self::$dbh = new \OpenFuego\lib\DbHandle();
+			self::$dbh = new DbHandle();
 		}
 		
 		return self::$dbh;

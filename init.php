@@ -47,9 +47,9 @@ spl_autoload_register(function($className) {
 });
 
 /* Setting miscellaneous constants */
-define('BASE_DIR', __DIR__);
-define('TMP_DIR', BASE_DIR . '/tmp');
-define('POSTMASTER', __NAMESPACE__ . '@' . __NAMESPACE__ . '.local'); // from address on error e-mails
+define(__NAMESPACE__ . '\BASE_DIR', __DIR__);
+define(__NAMESPACE__ . '\TMP_DIR', BASE_DIR . '/tmp');
+define(__NAMESPACE__ . '\POSTMASTER', __NAMESPACE__ . '@' . __NAMESPACE__ . '.local'); // from address on error e-mails
 
 if (!is_dir(TMP_DIR)) {
 	mkdir(TMP_DIR);
@@ -58,7 +58,7 @@ if (!is_dir(TMP_DIR)) {
 
 const TWITTER_PREDICATE_LIMIT = 5000;
 
-define('BITLY_PRO_DOMAINS', serialize(
+define(__NAMESPACE__ . '\BITLY_PRO_DOMAINS', serialize(
 	array(  // assume these domains are shortened with Bitly
 		'bit.ly',
 		'bitly.com',
@@ -66,7 +66,7 @@ define('BITLY_PRO_DOMAINS', serialize(
 	)
 ));
 
-define('SHORT_DOMAINS', serialize(
+define(__NAMESPACE__ . '\SHORT_DOMAINS', serialize(
 	array(  // domains whose "long" urls are already short
 		'twitpic.com',
 		'instagr.am',

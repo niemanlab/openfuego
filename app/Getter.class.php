@@ -1,12 +1,15 @@
 <?php namespace OpenFuego\app;
 
+use OpenFuego\lib\DbHandle as DbHandle;
+use OpenFuego\lib\Metadata as Metadata;
+
 class Getter {
 
 	protected $_dbh;
 
 	protected function getDbh() {
 		if (!$this->_dbh) {
-			$this->_dbh = new \OpenFuego\lib\DbHandle;
+			$this->_dbh = new DbHandle();
 		}
 		
 		return $this->_dbh;
@@ -125,7 +128,7 @@ class Getter {
 			$link_meta = array();
 			$urls_chunked = array_chunk($urls, 20);  // Embedly handles maximum 20 URLs per request
 			foreach ($urls_chunked as $urls_chunk) {
-				$link_meta_chunk = \OpenFuego\lib\Metadata::instantiate()->get($urls_chunk, $metadata_params);
+				$link_meta_chunk = Metadata::instantiate()->get($urls_chunk, $metadata_params);
 				$link_meta_chunk = json_decode($link_meta_chunk, TRUE);
 				$link_meta = array_merge($link_meta, $link_meta_chunk);
 			}
@@ -150,7 +153,7 @@ class Getter {
 	
 			$item_filtered['rank'] = $key + 1;
 			
-			$metadata = new \OpenFuego\lib\Metadata;
+			$metadata = new Metadata();
 			$status = $metadata->getTweet($link_id);
 	
 			$tw_id_str = $status['id_str'];

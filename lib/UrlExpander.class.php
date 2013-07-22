@@ -17,8 +17,8 @@ class UrlExpander {
 	
 
 	 public function __construct() {
-		$this->_bitly_pro_domains = unserialize(BITLY_PRO_DOMAINS);
-		$this->_short_domains = unserialize(SHORT_DOMAINS);
+		$this->_bitly_pro_domains = unserialize(\OpenFuego\BITLY_PRO_DOMAINS);
+		$this->_short_domains = unserialize(\OpenFuego\SHORT_DOMAINS);
 
 		if (defined('\OpenFuego\BITLY_USERNAME')) {
 			 $this->_bitly_username = \OpenFuego\BITLY_USERNAME;
@@ -82,7 +82,7 @@ class UrlExpander {
 
 			$longUrl = $this->isgd($inputUrl);
 
-		elseif (strpos($inputUrl, '://' . 'goo.gl' . '/') && defined('\OpenFuego\GOOGL_API_KEY') && \OpenFuego\GOOGL_API_KEY):
+		elseif (strpos($inputUrl, '://' . 'goo.gl' . '/') && $this->_googl_api_key):
 
 			$longUrl = $this->googl($inputUrl);
 
@@ -261,7 +261,7 @@ class UrlExpander {
 
 	public function getDbh() {
 		if (!$this->_dbh) {
-			$this->_dbh = new DbHandle;
+			$this->_dbh = new DbHandle();
 		}
 		
 		return $this->_dbh;
@@ -270,7 +270,7 @@ class UrlExpander {
 
 	public function getCurl() {
 		if (!$this->_curl) {
-			$this->_curl = new Curl;
+			$this->_curl = new Curl();
 		}
 		
 		return $this->_curl;

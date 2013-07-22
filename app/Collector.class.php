@@ -4,8 +4,8 @@ class Collector extends \OauthPhirehose {
 	/**
 	* Subclass specific constants
 	*/
-	const QUEUE_FILE_PREFIX = 'OpenFuegoQueue';
-	const QUEUE_FILE_ACTIVE = '.OpenFuegoQueue.current';
+	const QUEUE_FILE_PREFIX = 'CollectorQueue';
+	const QUEUE_FILE_ACTIVE = '.CollectorQueue.current';
 	
 	/**
 	* Member attributes specific to this subclass
@@ -26,7 +26,7 @@ class Collector extends \OauthPhirehose {
 	* @param integer $rotateInterval
 	*/
 
-	public function __construct($token, $secret, $queueDir = TMP_DIR, $rotateInterval = 10) {
+	public function __construct($token, $secret, $queueDir = \OpenFuego\TMP_DIR, $rotateInterval = 10) {
 	
 		// Set subclass parameters
 		$this->queueDir = $queueDir;
@@ -122,7 +122,7 @@ class Collector extends \OauthPhirehose {
 		// $this->log('Successfully rotated active stream to queue file: ' . $queueFile) . "\n";
 	}
 	
-	protected function log($message,$level='notice') {
+	protected function log($message, $level = 'notice') {
 
 	}
 

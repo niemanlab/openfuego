@@ -1,5 +1,10 @@
 <?php namespace OpenFuego\app;
 
+use OpenFuego\lib\UrlExpander as UrlExpander;
+use OpenFuego\lib\DbHandle as DbHandle;
+use OpenFuego\app\Universe as Universe;
+use OpenFuego\lib\Logger as Logger;
+
 class Consumer {
 	
 	/**
@@ -14,7 +19,7 @@ class Consumer {
 	/**
 	 * Construct the consumer and start processing
 	 */
-	public function __construct($queueDir = TMP_DIR, $filePattern = 'OpenFuegoQueue*.queue', $checkInterval = 10) {
+	public function __construct($queueDir = \OpenFuego\TMP_DIR, $filePattern = 'CollectorQueue*.queue', $checkInterval = 10) {
 		$this->_queueDir = $queueDir;
 		$this->_filePattern = $filePattern;
 		$this->_checkInterval = $checkInterval;
@@ -44,7 +49,7 @@ class Consumer {
 			$queueFiles = glob($this->_queueDir . '/' . $this->_filePattern);
 			$lastCheck = time();
 			
-			\OpenFuego\lib\Logger::debug('Found ' . count($queueFiles) . ' queue files to process...');
+			Logger::debug('Found ' . count($queueFiles) . ' queue files to process...');
 			
 			// Iterate over each file (if any)
 			foreach ($queueFiles as $queueFile) {
@@ -57,7 +62,7 @@ class Consumer {
 			}
 	
 			// Wait until ready for next check
-			\OpenFuego\lib\Logger::debug('Sleeping...');
+			Logger::debug('Sleeping...');
 			while (time() - $lastCheck < $this->_checkInterval) {
 				sleep(1);
 			}
@@ -70,14 +75,14 @@ class Consumer {
 	 * @param string $queueFile The queue file
 	 */
 	protected function processQueueFile($queueFile) {
-		\OpenFuego\lib\Logger::debug('Processing file: ' . $queueFile);
+		Logger::debug('Processing file: ' . $queueFile);
 		
 		// Open file
 		$fp = fopen($queueFile, 'r');
 		
 		// Check if something has gone wrong, or perhaps the file is just locked by another process
 		if (!is_resource($fp)) {
-			\OpenFuego\lib\Logger::error('WARN: Unable to open file or file already open: ' . $queueFile . ' - Skipping.');
+			Logger::error('WARN: Unable to open file or file already open: ' . $queueFile . ' - Skipping.');
 			return FALSE;
 		}
 		
@@ -94,7 +99,7 @@ class Consumer {
 			
 			// if data is invalid (e.g., if a user has deleted a tweet; surprisingly frequent)
 			if (is_array($status) == FALSE || !isset($status['user']['id_str'])) {
-	 			\OpenFuego\lib\Logger::debug('Status is invalid, continuing.');
+	 			Logger::debug('Status is invalid, continuing.');
 				continue; // skip it
 			}
 
@@ -110,7 +115,7 @@ class Consumer {
 
 			$this->processUrls($status);
 			
-			\OpenFuego\lib\Logger::debug('Decoded tweet: ' . $status['user']['screen_name'] . ': ' . urldecode($status['text']));
+			Logger::debug('Decoded tweet: ' . $status['user']['screen_name'] . ': ' . urldecode($status['text']));
 	
 			set_time_limit(60);
 		
@@ -122,7 +127,7 @@ class Consumer {
 		fclose($fp);
 		
 		// All done with this file
-		\OpenFuego\lib\Logger::debug('Successfully processed ' . $statusCounter . ' tweets from ' . $queueFile . ' - deleting.');
+		Logger::debug('Successfully processed ' . $statusCounter . ' tweets from ' . $queueFile . ' - deleting.');
 		unset($rawStatus);
 		unlink($queueFile);		
 	}
@@ -133,7 +138,7 @@ class Consumer {
 		$dbh = $this->getDbh();
 		
 		if (!$this->_urlExpander) {
-			$this->_urlExpander = new \OpenFuego\lib\UrlExpander;
+			$this->_urlExpander = new UrlExpander();
 		}
 		
 		$urlExpander = $this->_urlExpander;
@@ -157,7 +162,7 @@ class Consumer {
 	
 			$first_user_id = $status['user']['id_str'];
 	
-			$weighted_count = \OpenFuego\app\Universe::getInfluence($first_user_id);
+			$weighted_count = Universe::getInfluence($first_user_id);
 			
 			try {
 				$sql = "INSERT INTO openfuego_links (
@@ -246,7 +251,7 @@ class Consumer {
 	
 	protected function getDbh() {
 		if (!$this->_dbh) {
-			$this->_dbh = new \OpenFuego\lib\DbHandle;
+			$this->_dbh = new DbHandle();
 		}
 		
 		return $this->_dbh;
