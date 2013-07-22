@@ -8,7 +8,7 @@ Fuego and OpenFuego were created by [Andrew Phelps](https://twitter.com/andrewph
 
 ### How it works
 
-1. __Curate.__ You select up to 15 people — authorities — to form the center of OpenFuego’s universe.
+1. __Curate.__ You select up to 15 Twitter users — authorities — to form the center of OpenFuego’s universe.
 
 2. __Automate.__ OpenFuego follows those authorities, as well as all of the people they follow, up to a total of 5,000  sources. Each and every time one of those sources shares a link, OpenFuego captures it into a database with some simple analytics. OpenFuego is running in the background 24 hours a day.
 
@@ -32,7 +32,7 @@ Include init.php at the top of any script that queries OpenFuego. See examples/g
 
 ### Requirements and notes
 
-OpenFuego is PHP. It requires PHP 5.3.0 or higher, MySQL 5.0 or higher, and a *nix environment. In many cases the program won't work in shared hosting environments and you'll need root access. This is because OpenFuego is designed to run continuously in the background, like a daemon. (If you know much about programming, you know PHP is a bad language for this type of program. PHP is what I knew when I first sat down to write the program, and by the time it became big and complex, it would have been too much work to learn a different language and start from scratch.)
+OpenFuego is PHP. It requires PHP 5.3.0 or higher, MySQL 5.0 or higher, and a *nix environment. In many cases the program won’t work in shared hosting environments and you’ll need root access. This is because OpenFuego is designed to run continuously in the background, like a daemon. (If you know much about programming, you know PHP is a bad language for this type of program. PHP is what I knew when I first sat down to write the program, and by the time it became big and complex, it would have been too much work to learn a different language and start from scratch.)
 
 OpenFuego is really three discrete programs: the Collector, the Consumer, and the Getter. The Collector is constantly connected to [Twitter’s streaming API](https://dev.twitter.com/docs/streaming-apis), saving all new tweets to temporary files on disk. The Consumer is constantly parsing those files, extracting the URLs, cleaning them up, and saving them to a database. The Collector and the Consumer run concurrently in separate processes. The Getter is a class that retrieves URLs from the database and does some math to tell you what’s most popular in a given timeframe. If you specify an Embed.ly API key, the Getter can optionally return fully hydrated metadata for the URLs.
 
