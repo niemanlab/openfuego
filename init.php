@@ -17,7 +17,15 @@ define('OPENFUEGO', TRUE);
 
 require(__DIR__ . '/config.php');
 
-if (defined('OpenFuego\VERBOSE') && \OpenFuego\VERBOSE == TRUE) {
+if (isset($argv) && in_array('-v', $argv)) {
+	define(__NAMESPACE__ . '\VERBOSE', TRUE);
+}
+
+else {
+	define(__NAMESPACE__ . '\VERBOSE', FALSE);
+}
+
+if (\OpenFuego\VERBOSE == TRUE) {
 	ini_set('display_errors', 1);
 	ini_set('error_reporting', E_ALL);
 }

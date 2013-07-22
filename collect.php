@@ -12,16 +12,6 @@ if (php_sapi_name() != 'cli') {
 	die('This script must be invoked from the command line.');
 }
 
-if (defined(__NAMESPACE__ . '\VERBOSE') == FALSE) {
-	if (in_array('-v', $argv)) {
-		define(__NAMESPACE__ . '\VERBOSE', TRUE);
-	}
-	
-	else {
-		define(__NAMESPACE__ . '\VERBOSE', FALSE);
-	}	
-}
-
 if (!defined('OPENFUEGO') && function_exists('pcntl_fork')) {
 	$error_message = "\n"
 		. 'Do not run this script directly. Run fetch.php to start.'

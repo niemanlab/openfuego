@@ -8,14 +8,6 @@ if (php_sapi_name() != 'cli') {
 	die('This script must be invoked from the command line.');
 }
 
-if (in_array('-v', $argv)) {
-	define(__NAMESPACE__ . '\VERBOSE', TRUE);
-}
-
-else {
-	define(__NAMESPACE__ . '\VERBOSE', FALSE);
-}
-
 require_once(__DIR__ . '/init.php');
 
 if (!function_exists('pcntl_fork')) {
