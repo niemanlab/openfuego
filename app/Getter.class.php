@@ -1,4 +1,4 @@
-<?php namespace OpenFuego\app\Getter;
+<?php namespace OpenFuego\app;
 
 class Getter {
 

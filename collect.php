@@ -37,7 +37,7 @@ register_shutdown_function(function() {
 
 $authorities = unserialize(AUTHORITIES);
 
-$universe = new app\Universe\Universe;
+$universe = new app\Universe;
 
 /** The next line is commented out by default.
   * Uncomment it to repopulate the universe on each fetch. */
@@ -54,7 +54,7 @@ if (!$citizens) {
 $citizens = array_slice($citizens, 0, TWITTER_PREDICATE_LIMIT);
 	
 // Start streaming/collecting
-$collector = new app\Collector\Collector(TWITTER_OAUTH_TOKEN, TWITTER_OAUTH_SECRET);
+$collector = new app\Collector(TWITTER_OAUTH_TOKEN, TWITTER_OAUTH_SECRET);
 
 $collector->setFollow($citizens);
 

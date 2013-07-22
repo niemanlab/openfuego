@@ -91,7 +91,7 @@ try {
 
 $dbh = NULL;
 
-$consumer = new \OpenFuego\app\Consumer\Consumer;
+$consumer = new \OpenFuego\app\Consumer;
 $consumer->process();
 
 exit;

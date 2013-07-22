@@ -1,4 +1,4 @@
-<?php namespace OpenFuego\app\Consumer;
+<?php namespace OpenFuego\app;
 
 class Consumer {
 	
@@ -104,7 +104,7 @@ class Consumer {
 		
 			/* Weed out statuses created by undesired user. (The streaming API also returns _retweets of_
 			** statuses by desired user, which we don't want.) */
-			if (!\OpenFuego\app\Universe\Universe::isCitizen($status['user']['id_str'])) {	// if the tweeter is not a citizen
+			if (!\OpenFuego\app\Universe::isCitizen($status['user']['id_str'])) {	// if the tweeter is not a citizen
 				continue; // skip it
 			}			
 
@@ -157,7 +157,7 @@ class Consumer {
 	
 			$first_user_id = $status['user']['id_str'];
 	
-			$weighted_count = \OpenFuego\app\Universe\Universe::getInfluence($first_user_id);
+			$weighted_count = \OpenFuego\app\Universe::getInfluence($first_user_id);
 			
 			try {
 				$sql = "INSERT INTO openfuego_links (

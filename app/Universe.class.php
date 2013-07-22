@@ -1,4 +1,4 @@
-<?php namespace OpenFuego\app\Universe;
+<?php namespace OpenFuego\app;
 
 class Universe {
 
