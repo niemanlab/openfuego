@@ -4,7 +4,7 @@ OpenFuego is the open-source version of [Fuego](http://www.niemanlab.org/fuego),
 
 OpenFuego is essentially “Fuego in a box,” allowing you to monitor your own universe of people on Twitter — celebrities, tech writers, film critics, Canadians, or just people you like.
 
-Fuego and OpenFuego were created by [Andrew Phelps](https://twitter.com/andrewphelps) for the [Nieman Journalism Lab](http://www.niemanlab.org/). OpenFuego relies heavily on @fennb’s [Phirehose](https://github.com/fennb/phirehose) library and @abraham’s [twitteroauth](https://github.com/abraham/twitteroauth) library.
+Fuego and OpenFuego were created by [Andrew Phelps](https://twitter.com/andrewphelps) for the [Nieman Journalism Lab](http://www.niemanlab.org/). It was influenced by [Hourly Press](http://www.theatlantic.com/technology/archive/2011/08/fuego-a-bot-that-turns-the-twitter-firehose-into-a-trickle/244355/), created by Steve Farrell and Lyn Headley. OpenFuego relies heavily on @fennb’s [Phirehose](https://github.com/fennb/phirehose) library and @abraham’s [twitteroauth](https://github.com/abraham/twitteroauth) library.
 
 ### How it works
 
