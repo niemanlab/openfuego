@@ -2,6 +2,7 @@
 
 use OpenFuego\lib\TwitterHandle as TwitterHandle;
 use OpenFuego\lib\DbHandle as DbHandle;
+use OpenFuego\lib\Logger as Logger;
 
 class Universe {
 
@@ -58,7 +59,9 @@ class Universe {
 			$authority_friends_ids = $twitter->get('friends/ids', array('screen_name' => $authority['screen_name']));
 
 			if ($twitter->http_code != 200) {
-				die('Dying, ' . $twitter->http_code);
+				$error_message = __METHOD__ . " failed, Twitter error {$twitter->http_code}. Dying.";
+				Logger::fatal($error_message);
+				die();
 			}
 
 			$authority_friends_ids = $authority_friends_ids['ids'];
