@@ -14,6 +14,11 @@
   */
 
 namespace OpenFuego;
+
+/* Your time zone. Harvard time is 'America/New_York'.
+ * http://php.net/manual/en/timezones.php
+**/
+date_default_timezone_set('America/New_York');
 	
 /** Time to curate.
   * Specify the authorities at the center of the universe.
