@@ -22,7 +22,7 @@ date_default_timezone_set('America/New_York');
 	
 /** Time to curate.
   * Specify the authorities at the center of the universe.
-  * Maximum 15. No @ symbol necessary.
+  * Minimum 1, maximum 15. No @ symbol necessary.
  **/
 define(__NAMESPACE__ . '\AUTHORITIES', serialize(
 	array(
