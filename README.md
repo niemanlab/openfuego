@@ -10,7 +10,7 @@ Fuego and OpenFuego were created by [Andrew Phelps](https://twitter.com/andrewph
 
 1. __Curate.__ You select up to 15 Twitter users — authorities — to form the center of OpenFuego’s universe.
 
-2. __Automate.__ OpenFuego follows those authorities, as well as all of the people they follow, up to a total of 5,000  sources. Each and every time one of those sources shares a link, OpenFuego captures it into a database with some simple analytics. OpenFuego is running in the background 24 hours a day.
+2. __Automate.__ OpenFuego follows those authorities, as well as all of the people they follow, up to a total of 5,000 sources. Each and every time one of those sources shares a link, OpenFuego captures it into a database with some simple analytics. OpenFuego is running in the background 24 hours a day.
 
 3. __Query.__ You can query OpenFuego to determine which links are being talked about most in that universe. OpenFuego does some math to strike a good balance between quality and freshness, then returns a ranked list of URLs and metadata.
 
@@ -24,9 +24,9 @@ Follow the instructions in config.php. Create a MySQL database and enter the cre
 
 Once config.php is edited, run `fetch.php` at the command line. You may or not get further instructions, depending on whether your version of PHP is compiled with process control.
 
-To run OpenFuego in verbose mode, which displays the program’s output on screen, run `fetch.php -v`.
+__Recommended option for new users:__ To run OpenFuego in verbose mode, which displays helpful errors and warnings on screen, run `fetch.php -v`.
 
-You can `kill` the two processes at any time. The script may take a few seconds to clean up before terminating.
+You can `kill` the two processes at any time. The script may take a few seconds to clean up before terminating. Always make sure to kill any and all old OpenFuego processes before initializing.
 
 Include init.php at the top of any script that queries OpenFuego. See examples/getLinks.php for a dead-simple example and more instructions.
 
