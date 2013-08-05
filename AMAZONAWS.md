@@ -1,6 +1,6 @@
 # OpenFuego in a(n Amazon) Box
 
-There is an AMI on Amazon Web Services that allows you to quickly deploy a cloud server to run OpenFuego. You can use [EC2 for Poets](http://ec2.forpoets.org/) as a guide. A full guide is forthcoming. Below I've documented what that box includes:
+There is an AMI on Amazon Web Services that allows you to quickly deploy a cloud server to run OpenFuego. Search for 'OpenFuego' in the [AWS Marketplace](https://aws.amazon.com/marketplace/). You can use [EC2 for Poets](http://ec2.forpoets.org/) as a guide for launching and running your own AWS instance. A full guide for OpenFuego is forthcoming. Below I've documented what that box includes:
 
 ## Software installed:
 
