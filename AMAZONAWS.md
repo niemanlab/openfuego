@@ -22,6 +22,8 @@ Created folder /var/www/openfuego - fetched OpenFuego from Nieman (run `git pull
 
 Created index.php in /var/www that will quickly return some links as soon as they're pulled to test your implementation
 
+Removed rootlogin with password (keypair required)
+
 ## What you need to do:
 
 Log in to phpmyadmin and change the [mysql](http://www.cyberciti.biz/faq/mysql-change-root-password/) and [phpmyadmin](http://stackoverflow.com/questions/14703223/mysql-phpmyadmin-reset-root-password) passwords
@@ -30,4 +32,4 @@ Create database in phpmyadmin
 
 Copy and edit config.php with info
 
-Run fetch.php
+Run fetch.php `php fetch.php` (I typically run w `-v` to see if there are any problems)
