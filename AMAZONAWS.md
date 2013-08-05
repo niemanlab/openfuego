@@ -2,7 +2,7 @@
 
 There is an AMI on Amazon Web Services that allows you to quickly deploy a cloud server to run OpenFuego. You can use [EC2 for Poets](http://ec2.forpoets.org/) as a guide. A full guide is forthcoming. Below I've documented what that box includes:
 
-Software installed:
+## Software installed:
 
 * ubuntu 12.04 LTS
 * apache2
@@ -12,7 +12,7 @@ Software installed:
 * phpmyadmin (admin user password: 0p3n-fu3g0 - __change this immediately__)
 * git
 
-Commands run:
+## Commands run:
 
 Followed Phelps' instructions [here](https://github.com/niemanlab/openfuego/issues/4#issuecomment-21755406)
 
@@ -22,12 +22,12 @@ Created folder /var/www/openfuego - fetched OpenFuego from Nieman (run `git pull
 
 Created index.php in /var/www that will quickly return some links as soon as they're pulled to test your implementation
 
-What you need to do:
+## What you need to do:
 
 Log in to phpmyadmin and change the [mysql](http://www.cyberciti.biz/faq/mysql-change-root-password/) and [phpmyadmin](http://stackoverflow.com/questions/14703223/mysql-phpmyadmin-reset-root-password) passwords
 
 Create database in phpmyadmin
 
-Copy and edit config.php filled in for info
+Copy and edit config.php with info
 
 Run fetch.php
