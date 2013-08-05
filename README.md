@@ -30,6 +30,22 @@ You can `kill` the two processes at any time. The script may take a few seconds 
 
 Include init.php at the top of any script that queries OpenFuego. See examples/getLinks.php for a dead-simple example and more instructions.
 
+#### OpenFuego in a(n Amazon) Box
+
+This AWS server includes:
+
+* apache2
+* php5 (with php5-curl)
+* sendmail
+* mysql-server (root password: 0p3n-fu3g0 - __change this immediately__)
+* phpmyadmin (admin user password: 0p3n-fu3g0 - __change this immediately__)
+* git
+
+Has phpmyadmin symlinked (cmd: `ln -s /usr/share/phpmyadmin /var/www/phpmyadmin`)
+
+Create /var/www/openfuego - fetched OpenFuego from Nieman (run `git pull origin master` to update to latest version)
+
+
 ### Requirements and notes
 
 OpenFuego is PHP. It requires PHP 5.3.0 or higher, MySQL 5.0 or higher, and a *nix environment. In many cases the program won’t work in shared hosting environments and you’ll need root access. This is because OpenFuego is designed to run continuously in the background, like a daemon. (If you know much about programming, you know PHP is a bad language for this type of program. PHP is what I knew when I first sat down to write the program, and by the time it became big and complex, it would have been too much work to learn a different language and start from scratch.)
