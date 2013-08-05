@@ -20,6 +20,8 @@ OpenFuego is a backend application that runs at the command line. There is nothi
 
 Follow the instructions in config.php. Create a MySQL database and enter the credentials in that file, along with Twitter credentials and optional (but recommended) API keys for Bitly, Goo.gl, and Embed.ly.
 
+You can also check out AMAZONAWS for instructions on running OpenFuego on Amazon Web Services' free tier.
+
 ### Usage
 
 Once config.php is edited, run `fetch.php` at the command line. You may or not get further instructions, depending on whether your version of PHP is compiled with process control.
