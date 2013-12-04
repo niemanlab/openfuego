@@ -80,7 +80,7 @@
 		use OpenFuego\app\Getter as Getter;
 
 		$fuego = new Getter();
-		$items = $fuego->getItems(50, 24, FALSE, TRUE); // quantity, hours, scoring, metadata
+		$items = $fuego->getItems(20, 24, FALSE, TRUE); // quantity, hours, scoring, metadata
 		
 		$i = 0;
 			
