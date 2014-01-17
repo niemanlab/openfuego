@@ -2,6 +2,13 @@
 
 require_once(__DIR__ . '/Phirehose.class.php');
 
+
+/**
+*
+*
+* @internal At time of writing thise overrides getAuthorizationHeader() from the parent class;
+* all other functions are helper functions for that.
+*/
 abstract class OauthPhirehose extends Phirehose
 {
 
@@ -32,7 +39,7 @@ abstract class OauthPhirehose extends Phirehose
 		$oauth['oauth_nonce'] = md5(uniqid(rand(), true));
 		$oauth['oauth_signature_method'] = 'HMAC-SHA1';
 		$oauth['oauth_timestamp'] = time();
-		$oauth['oauth_version'] = '1.0';
+		$oauth['oauth_version'] = '1.0A';
 		$oauth['oauth_token'] = $this->username;
 		if (isset($params['oauth_verifier']))
 		{
@@ -136,36 +143,9 @@ abstract class OauthPhirehose extends Phirehose
 		return $oauth;
 	}
 
-	protected function getAuthorizationHeader()
+    /** Overrides base class function */
+	protected function getAuthorizationHeader($url,$requestParams)
 	{
-		$url = self::URL_BASE . $this->method . '.' . $this->format;
-		$urlParts = parse_url($url);
-
-		// Setup params appropriately
-		$requestParams = array('delimited' => 'length');
-
-		// Setup the language of the stream
-		if($this->lang) {
-			$requestParams['language'] = $this->lang;
-		}
-
-		// Filter takes additional parameters
-		if (count($this->trackWords) > 0)
-		{
-			$requestParams['track'] = implode(',', $this->trackWords);
-		}
-		if (count($this->followIds) > 0)
-		{
-			$requestParams['follow'] = implode(',', $this->followIds);
-		}
-		if (count($this->locationBoxes) > 0)
-		{
-			$requestParams['locations'] = implode(',', $this->locationBoxes);
-		}
-		if (count($this->count) <> 0) {
-			$requestParams['count'] = $this->count;
-		}
-
 		return $this->getOAuthHeader('POST', $url, $requestParams);
 	}
 }
