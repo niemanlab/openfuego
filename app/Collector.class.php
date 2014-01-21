@@ -45,7 +45,7 @@ class Collector extends \OauthPhirehose {
 	public function enqueueStatus($status) {
 		
 		// Write the status to the stream (must be via getStream())
-		fputs($this->getStream(), $status);
+		fputs($this->getStream(), $status . "\r\n");
 		
 		/* Are we due for a file rotate? Note this won't be called if there are no statuses coming through.
 		 */
